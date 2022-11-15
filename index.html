@@ -17,23 +17,89 @@
             <img src="./img/oliver-logo.png" alt="Oliver logo" class="main-logo">
         </div>
         <div class="header-links">
-            <a href="" class="a-link">About</a>
-            <a href="" class="a-link">Newsletter</a>
-            <a href="" class="a-link">Contacts</a>
+            <a href="#about-section" class="a-link">About</a>
+            <a href="#contact-section" class="a-link">Contacts</a>
+            <a href="" class="a-link">Log in</a>
             <button class="secondary">Sign up</button>
         </div>
     </div>
     <div id="content">
-        <div id="hero">
+        <div id="hero" class="info-shadow">
             <div id="hero-content">
                 <h1>Roommate finances<strong class="accent">.</strong> Better and easier<strong class="accent">.</strong></h1>
-                <p>Communicate with your roommates in a more productive fashion today.</p>
+                <p>Track financial data together with your cohabitants</p>
                 <button class="primary">Learn more</button>
             </div>
         </div>
+        <h2 class="info-title center">How we can help</h2>
         <div class="info">
             <div class="info-block"></div>
             <div class="info-block waves"></div>
+        </div>
+        <h2 class="info-title" id="about-section">About us</h2>
+        <div class="info">
+            <div class="info-block">
+                <p>This is a final project for the <span class="accent">Computer Science AP degree</span>, and will be defended January 2023.<br><br>
+                    The idea behind this project is to use the tools and techniques we've learned throughout the 2.5 years of studies
+                    and apply it in practice during this final part of the degree.<br><br>
+                    It was made by three talented students as listed below.
+                </p>
+                <div class="info">
+                    <div class="info-section">
+                        <img src="./img/profiles/aiste.jfif" alt="" class="profile">
+                        <h3>Aistė</h3>
+                        <i class="sub-title">Back-end expert</i>
+                    </div>
+                    <div class="info-section">
+                        <img src="./img/profiles/justas.jpg" alt="" class="profile">
+                        <h3>Justas</h3>
+                        <i class="sub-title">Cat enthusiast</i>
+                    </div>
+                    <div class="info-section">
+                        <img src="./img/profiles/ana.jfif" alt="" class="profile">
+                        <h3>Ana</h3>
+                        <i class="sub-title">Communications</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h2 class="info-title right" id="contact-section">Contact us</h2>
+        <div class="info">
+            <div class="info-block no-padding" id="letter">
+                <div class="fade-letter"></div>
+            </div>
+            <div class="info-block info-shadow">
+                <form action="" id="contact-form">
+                    <label for="Name" class="">First name</label>
+                    <input type="text" id="name-input" class="" required>
+
+                    <label for="Email" class="">Email</label>
+                    <input type="email" id="email-input" class="" required>
+                    
+                    <label for="Message" class="">Your message</label>
+                    <textarea id="message-input" class="" minlength="50" maxlength="500" required rows="5"></textarea>
+
+                    <div class="spacer"></div>
+                    <button class="primary" id="send-message-btn">Send message</button>
+                </form>
+            </div>
+        </div>
+        <h2 class="info-title center">Newsletter</h2>
+        <div class="info">
+            <div class="info-block waves" id="newsletter-block">
+                <p>Sign up for our newsletter to receive weekly emails with <span class="white-accent">tips and tricks</span> on how to Better
+                    communicate with your roommates, use our platform more efficiently and much more!
+                </p>
+                <div class="info-section">
+                    <form action="" id="newsletter-form">
+                        <div class="label-input-pair">
+                            <label for="Email" class="">Email</label><br>
+                            <input type="email" id="newsletter-input" class="" required>
+                        </div>
+                        <button class="secondary" id="newsletter-btn">Sign up</button>
+                    </form>
+                </div>
+            </div>
         </div>
         <div id="footer">© Oliver, 2022. All rights reserved.</div>
     </div>

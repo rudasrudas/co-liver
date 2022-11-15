@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log in</title>
+    <title>Sign up</title>
 
     <link rel="icon" type="image/x-icon" href="/img/icon.ico">
     <link rel="stylesheet" href="/style/style.css">
@@ -15,14 +15,22 @@
     <div class="single-content">
         <img src="../img/oliver-logo.png" alt="Oliver logo" class="main-logo">
         <form action="" class="form-block">
-            <h1>Log in</h1>
+            <h1>Sign up</h1>
+            <label for="Name">First name</label>
+            <input type="text" id="name-input">
+
             <label for="Email">Email</label>
             <input type="text" id="email-input">
-            <label for="Password">Password</label>
+
+            <label for="Password">Create password</label>
             <input type="password" id="password-input">
+
+            <label for="RepeatPassword">Repeat password</label>
+            <input type="password" id="repeat-input">
+
             <div class="spacer"></div>
-            <button class="secondary" id="login-btn">Log in</button>
-        </form>
+            <button class="secondary" id="continue-btn">Continue</button>
+        </form> 
         <p class="tiny-footer">© Oliver, 2022. All rights reserved.</p>
     </div>
 </body>
