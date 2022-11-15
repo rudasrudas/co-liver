@@ -101,7 +101,9 @@ body {
 }
 
 #newsletter-block {
-    background-position-y: -150px;
+    background-position-y: -50px;
+    background-size: cover;
+    /* background-position-y: bottom; */
 }
 
 #newsletter-form {
@@ -109,7 +111,6 @@ body {
     flex-direction: row;
     justify-content: space-between;
     gap: 15px;
-
 }
 
 #newsletter-input {
@@ -226,7 +227,7 @@ input:-webkit-autofill{
 }
 
 .info-title {
-    margin-top: 30px;
+    padding-top: 45px;
     margin-bottom: 10px;
 }
 
@@ -402,8 +403,34 @@ button.secondary:active {
 100% {transform: rotate(360deg); transform-origin: 50%;}  
 }
 
-.alink:hover::before {
-    display: block;
+a.white {
+    color: var(--primary-white);
+    text-decoration: underline;
+}
+
+a.white:visited {
+    color: var(--primary-light-gray);
+}
+
+a.white:hover {
+    color: var(--primary-black);
+}
+
+a.black {
+    color: var(--primary-black);
+    text-decoration: underline;
+}
+
+a.black:visited {
+    color: var(--primary-gray);
+}
+
+a.black:hover {
+    color: var(--primary-gray);
+}
+
+p.note {
+    font-size: 10px;
 }
 
 .master-margin {
