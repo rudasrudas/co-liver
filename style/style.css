@@ -10,6 +10,7 @@
     --primary-gray: #a8a8a8;
     --primary-light-gray: #f7f7f7;
     --primary-white: #ffffff;
+    --primary-transparent-white: #ffffff80;
 }
 
 *, *::before, *::after {
@@ -118,7 +119,6 @@ body {
 }
 
 #newsletter-btn {
-    /* margin-top: 15px; */
     width: 30%;
 }
 
@@ -128,6 +128,9 @@ body {
 
 .label-input-pair {
     width: 66%;
+}
+
+.label-input-pair label {
 }
 
 .form-block {
@@ -141,6 +144,14 @@ body {
     background-position-x: -150px;
     background-position-y: -110px;
     background-size: 200%;
+}
+
+span.material-icons {
+    vertical-align: middle;
+}
+
+span.material-icons.no-height {
+    line-height: 0.2;
 }
 
 form {
@@ -255,6 +266,7 @@ input:-webkit-autofill{
 .info-shadow {
     box-shadow: 0px 0px 10px #0002;
     background-color: var(--primary-white);
+    border-radius: 15px;
 }
 
 .info-section {
@@ -276,6 +288,10 @@ img.profile {
     border: solid 2px var(--primary-white);
     box-shadow: 3px 3px var(--primary-white);
     margin-bottom: 10px;
+}
+
+.zoom-pic:hover {
+    background-blend-mode:multiply;
 }
 
 .info-section h3 {
@@ -306,6 +322,10 @@ img.profile {
     color: var(--primary-red);
 }
 
+.gray-accent {
+    color: var(--primary-light-gray);
+}
+
 .white-accent {
     color: var(--primary-white);
 }
@@ -333,7 +353,7 @@ button.primary:active {
     margin: 3px -3px -3px 3px;
 }
 
-button.secondary {
+button.secondary, a.secondary {
     width: auto;
     height: auto;
     padding: 10px 15px;
@@ -345,13 +365,14 @@ button.secondary {
     font-weight: 700;
     font-size: 15px;
     box-shadow: 3px 3px #0005;
+    text-decoration: none;
 }
 
-button.secondary:hover {
+button.secondary:hover, a.secondary:hover {
     box-shadow: 3px 3px var(--primary-black);
 }
 
-button.secondary:active {
+button.secondary:active, a.secondary:active {
     box-shadow: none;
     margin: 3px -3px -3px 3px;
 }
@@ -443,6 +464,8 @@ p.note {
 .main-logo {
     width: 150px;
     height: auto;
+    display: flex;
+    flex: 0 1 auto;
 }
 
 .header-links {
