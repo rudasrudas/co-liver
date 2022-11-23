@@ -6,35 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System</title>
 
-    <link rel="icon" type="image/x-icon" href="../img/icon.ico">
-    <link rel="stylesheet" href="../style/style.css">
-    <link rel="stylesheet" href="../style/system.css">
+    <link rel="icon" type="image/x-icon" href="/img/icon.ico">
+    <link rel="stylesheet" href="/style/style.css">
+    <link rel="stylesheet" href="/style/system.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-    <script src="../script/setup.js"></script>
-    <script src="../system/system.js"></script>
+    <script src="/script/setup.js"></script>
+    <script src="/system/system.js"></script>
 </head>
 <body class="master-margin" id="system">
     <div id="sidebar">
-        <img src="../img/oliver-logo.png" alt="Oliver logo" class="main-logo">
+        <img src="/img/oliver-logo.png" alt="Oliver logo" class="main-logo">
         <div id="menu" class="info-shadow">
             <div class="account-info">
                 <h3 id="account-name">Justas</h3>
-                <span class="material-icons account-dots icn-18">settings</span>
+                <span class="material-icons account-dots icn-18">logout</span>
             </div>
             <div id="navigation">
-                <p id="overview"><span class="material-icons icn">star</span> Overview</p>
+                <p id="overview-link"><span class="material-icons icn">star</span> Overview</p>
                 <br>
-                <p id="favorites"><span class="material-icons icn">favorite</span> Favorites</p>
-                <p id="accomodation"><span class="material-icons icn">home</span> Household</p>
-                <p id="cohabitants"><span class="material-icons icn">people_alt</span> Cohabitants</p>
-                <p id="archive"><span class="material-icons icn">inventory</span> Archive</p>
+                <p id="household-link"><span class="material-icons icn">home</span> Household</p>
+                <p id="cohabitants-link"><span class="material-icons icn">people_alt</span> Cohabitants</p>
+                <ul id="cohabitants-list">
+                    <li><span class="material-icons icn">chevron_right</span>Michael</li>
+                    <li><span class="material-icons icn">chevron_right</span>Phyllis</li>
+                    <li><span class="material-icons icn">chevron_right</span>Angela</li>
+                    <li><span class="material-icons icn">chevron_right</span>Jim</li>
+                    <li><span class="material-icons icn">chevron_right</span>Pam</li>
+                    <li><span class="material-icons icn">chevron_right</span>Oscar</li>
+                    <li><span class="material-icons icn">chevron_right</span>Dwight</li>
+                    <li><span class="material-icons icn">chevron_right</span>Kevin</li>
+                    <li><span class="material-icons icn">chevron_right</span>Stanley</li>
+                    <li><span class="material-icons icn">chevron_right</span>Gabe</li>
+                    <li><span class="material-icons icn">chevron_right</span>Phyllis</li>
+                    <li><span class="material-icons icn">chevron_right</span>Angela</li>
+                    <li><span class="material-icons icn">chevron_right</span>Michael</li>
+                    <li><span class="material-icons icn">chevron_right</span>Phyllis</li>
+                </ul>
+                <p id="settings-link"><span class="material-icons icn">settings</span> Settings</p>
             </div>
         </div>
     </div>
     <div id="system-content">
-        <div id="overview-page" class="page">
+        <div id="overview" class="page">
             <h2 class="page-title">Overview</h2>
+        </div>
+        <div id="household" class="page">
+            <h2 class="page-title">Household</h2>
+        </div>
+        <div id="cohabitants" class="page">
+            <h2 class="page-title">Cohabitants</h2>
+        </div>
+        <div id="settings" class="page">
+            <h2 class="page-title">Settings</h2>
         </div>
     </div>
 </body>

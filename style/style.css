@@ -10,7 +10,7 @@
     --primary-gray: #a8a8a8;
     --primary-light-gray: #f7f7f7;
     --primary-white: #ffffff;
-    --primary-transparent-white: #ffffff80;
+    --primary-transparent-white: #ffffff40;
 }
 
 *, *::before, *::after {
