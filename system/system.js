@@ -31,4 +31,10 @@ window.onload = () => {
     const alerts = document.createElement("div");
     alerts.id = "alerts";
     document.body.appendChild(alerts);
+
+    //Logout functionality
+    document.querySelector('#logout').addEventListener('click', () => {
+        window.localStorage.setItem('userAuth', null);
+        location.href = '/';
+    })
 }

@@ -3,45 +3,40 @@ window.onload = () => {
     const alerts = document.createElement("div");
     alerts.id = "alerts";
     document.body.appendChild(alerts);
-    const btnSendMessage = document.getElementById('send-message-btn');
-    btnSendMessage.addEventListener("click", sendMessage);
-    
 }
 
 function sendMessage(){
-    console.log("test");
-    console.log(document.querySelector('#email-input').value);
+    hideError('#error-msg');
 
-    
-   // document.querySelector('form').startLoading();
-   // document.querySelector('#error-msg').textContent = '';
-
-    const jsonBody = {
+    const json = {
         "name": document.querySelector('#name-input').value,
         "email": document.querySelector('#email-input').value,
         "text": document.querySelector('#message-input').value
     }
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost/send-message', true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            // let res = JSON.parse(xhr.response);
-            inform("Message was sent successfuly!", "success");
-        }
-        else {
-            // inform("Failed to connect to the server.\nStatus code " + xhr.status, "failure");
-            // document.querySelector('#error-msg').textContent = "Invalid information. Please make sure that all fields are correct and passwords match.";
-            // document.querySelector('#error-msg').style.animation = "pulseText 1s linear";
-            // setTimeout(function(){ document.querySelector('#error-msg').style.animation = ""; }, 1100);
-            inform("Faillll", "failure");
-
-        }
-
-        //document.querySelector('form').stopLoading();
-    };
-    xhr.send(JSON.stringify(jsonBody));
+    if (!(json.name && json.email && json.text)) showError('#error-msg', "All fields are mandatory.");
+    else if (!json.email.includes('@')) showError('#error-msg', "Message has to be at least 50 characters long.");
+    else if (json.text.length < 50) showError('#error-msg', "Message has to be at least 50 characters long.");
+    else {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://45.80.152.150/send-message', true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                inform("Message was sent successfully!", "success");
+            }
+            else if (xhr.status === 400){
+                inform("Server failed to process the message. Please try again later", "failure");
+            }
+            else {
+                inform("Unknown error occured. Server might be down.\nPlease refresh and try again later", "failure");
+            }
+    
+            document.querySelector('form').stopLoading();
+        };
+        xhr.send(JSON.stringify(json));
+        document.querySelector('form').startLoading();
+    }
 
     return false;
 }

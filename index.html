@@ -74,7 +74,7 @@
                 <div class="fade-letter"></div>
             </div>
             <div class="info-block info-shadow">
-                <form action="" id="contact-form">
+                <form onsubmit="return sendMessage()" id="contact-form">
                     <label for="Name" class="">First name</label>
                     <input type="text" id="name-input" class="" required>
 
@@ -82,7 +82,9 @@
                     <input type="email" id="email-input" class="" required>
                     
                     <label for="Message" class="">Your message</label>
-                    <textarea id="message-input" class="" minlength="50" maxlength="500" required rows="5"></textarea>
+                    <textarea id="message-input" class="" required rows="5"></textarea>
+                    
+                    <p id="error-msg"></p>
 
                     <div class="spacer"></div>
                     <button class="primary" id="send-message-btn">Send message</button>
