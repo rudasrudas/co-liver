@@ -19,11 +19,11 @@ function registerUser(){
     }
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://45.80.152.150/register', true);
+    xhr.open('POST', 'http://45.80.152.150/login', true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onload = function() {
         if (xhr.status === 200) {
-            let res = JSON.parse(xhr.response);
+            // let res = JSON.parse(xhr.response);
             inform("Signed up successfuly!", "success");
         }
         else {

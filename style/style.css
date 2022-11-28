@@ -511,9 +511,10 @@ p.note {
 #alerts {
     width: var(--master-margin-width);
     height: auto;
-    position: absolute;
+    top: 0;
+    position: fixed;
     margin-top: 20px;
-    z-index: 2;
+    z-index: 3;
     align-self: flex-start;
 }
 
