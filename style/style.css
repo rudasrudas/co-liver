@@ -11,6 +11,15 @@
     --primary-light-gray: #f7f7f7;
     --primary-white: #ffffff;
     --primary-transparent-white: #ffffff40;
+
+    --failure-background: #f37272;
+    --failure-foreground: #701a1a;
+    --success-background: #52bd52;
+    --success-foreground: #0c570c;
+    --info-background: #63cfdd;
+    --info-foreground: #0d6c7c;
+
+    --master-margin-width: 800px;
 }
 
 *, *::before, *::after {
@@ -122,6 +131,22 @@ body {
     width: 30%;
 }
 
+#error-msg {
+    color: var(--primary-black);
+    margin-top: 5px;
+    font-size: 12px;
+    min-height: 20px;
+}
+
+@keyframes pulseText {
+    0% {opacity: 0;}
+    20% {opacity: 1;}
+    40% {opacity: 0;}
+    60% {opacity: 1;}
+    80% {opacity: 0;}
+    100% {opacity: 1;}
+}
+
 .tiny-footer {
     font-size: 10px;
 }
@@ -179,7 +204,7 @@ form label {
     text-transform: uppercase;
     font-size: 12px;
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 5px;
 }
 
@@ -288,6 +313,7 @@ img.profile {
     border: solid 2px var(--primary-white);
     box-shadow: 3px 3px var(--primary-white);
     margin-bottom: 10px;
+    user-select: none;
 }
 
 .zoom-pic:hover {
@@ -330,7 +356,7 @@ img.profile {
     color: var(--primary-white);
 }
 
-button.primary {
+button.primary, a.primary {
     width: auto;
     height: auto;
     padding: 10px 15px;
@@ -342,13 +368,15 @@ button.primary {
     font-weight: 700;
     font-size: 15px;
     box-shadow: 3px 3px var(--primary-red-transparent);
+    text-decoration: none;
+    user-select: none;
 }
 
-button.primary:hover {
+button.primary:hover, a.primary:hover {
     box-shadow: 3px 3px var(--primary-black);
 }
 
-button.primary:active {
+button.primary:active, a.primary:active {
     box-shadow: none;
     margin: 3px -3px -3px 3px;
 }
@@ -366,6 +394,7 @@ button.secondary, a.secondary {
     font-size: 15px;
     box-shadow: 3px 3px #0005;
     text-decoration: none;
+    user-select: none;
 }
 
 button.secondary:hover, a.secondary:hover {
@@ -455,7 +484,7 @@ p.note {
 }
 
 .master-margin {
-    max-width: 800px;
+    max-width: var(--master-margin-width);
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -466,6 +495,8 @@ p.note {
     height: auto;
     display: flex;
     flex: 0 1 auto;
+    user-select: none;
+    cursor: pointer;
 }
 
 .header-links {
@@ -473,4 +504,87 @@ p.note {
     gap: 30px;
     font-weight: 700;
     align-items: center;
+}
+
+/* ALERTS */
+
+#alerts {
+    width: var(--master-margin-width);
+    height: auto;
+    position: absolute;
+    margin-top: 20px;
+    z-index: 2;
+    align-self: flex-start;
+}
+
+.alert {
+    position: relative;
+    min-height: 50px;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 0px 10px 15px;
+    background-color: var(--primary-white);
+    border: solid 2px var(--primary-black);
+    box-shadow: 3px 3px var(--primary-black);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 15px;
+    
+    animation: disappear 1s forwards;
+    animation-delay: 10s;
+}
+
+@keyframes disappear {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+.alert > .alert-icon {
+    max-height: 50px;
+    border-radius: 75px;
+}
+
+.alert.failure > .alert-icon {
+    background-color: var(--failure-background);
+}
+
+.alert.success > .alert-icon {
+    background-color: var(--success-background);
+}
+
+.alert.information > .alert-icon {
+    background-color: var(--info-background);
+}
+
+.alert > p {
+    padding-right: 30px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* LOADING */
+
+.spinner {
+    position: absolute;
+    width: 40px;
+    height: auto;
+    border-radius: inherit;
+    animation: spin 1s infinite linear;
+    z-index: 2;
+    user-select: none;
+    /* display: flex;
+    justify-self: center;
+    align-self  : center; */
+}
+
+.unclickable {
+    pointer-events: none;
+    user-select: none;
 }

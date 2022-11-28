@@ -66,16 +66,20 @@
     font-size: 16px;
 }
 
-.account-dots {
+.logout {
     cursor: pointer;
     user-select: none;
+    border-radius: 100px;
+    padding: 3px 1px 3px 5px;
 }
 
 .icn-18 {
+    vertical-align: middle !important;
     font-size: 18px !important;
 }
 
 .icn {
+    vertical-align: top;
     font-size: 16px !important;
 }
 
@@ -113,12 +117,12 @@
     display: none;
 }
 
-#navigation > p:hover, #navigation > ul > li:hover {
+#navigation > p:hover, #navigation > ul > li:hover, .logout:hover {
     background-color: var(--primary-transparent-white);
 }
 
-#navigation > p:active, #navigation > p.active,
-#navigation > ul > li:active, #navigation > ul > li.active {
+/* #navigation > ul > li:active, #navigation > ul > li.active, */
+#navigation > p:active, #navigation > p.active, .logout:active { 
     background-color: var(--primary-white);
 }
 

@@ -1,6 +1,10 @@
 window.onload = () => {
+    //Details
+    document.querySelector(".main-logo").addEventListener('click', () => location.href = "/");
+
+    //Browsing logic
     const active = 'active';
-    const menuBtns = document.querySelectorAll("#navigation > p, #navigation > ul > li");
+    const menuBtns = document.querySelectorAll("#navigation > p");
     const pages = document.querySelectorAll("#system-content > .page");
 
     Array.from(menuBtns).forEach(e => {
@@ -22,4 +26,9 @@ window.onload = () => {
 
     menuBtns[0].classList.add(active);
     pages[0].classList.add(active);
+
+    // Enable alerts
+    const alerts = document.createElement("div");
+    alerts.id = "alerts";
+    document.body.appendChild(alerts);
 }

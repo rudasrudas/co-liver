@@ -11,30 +11,37 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
     <script src="/script/setup.js"></script>
+    <script src="/script/alerts.js"></script>
+    <script src="/script/loading.js"></script>
     <script src="/signup/signup.js"></script>
 </head>
 <body class="single-view">
     <div class="single-content">
         <img src="/img/oliver-logo.png" alt="Oliver logo" class="main-logo">
-        <!-- <form action="" class="form-block"> -->
+        <form onsubmit="return registerUser()" class="form-block">
             <h1>Sign up</h1>
-            <label for="Name">First name</label>
-            <input type="text" id="name-input">
+            <label for="Name">Name</label>
+            <input type="text" id="name-input" >
+            
+            <label for="Surname">Surname</label>
+            <input type="text" id="surname-input" >
 
             <label for="Email">Email</label>
-            <input type="text" id="email-input">
+            <input type="email" id="email-input" >
 
             <label for="Password">Create password</label>
-            <input type="password" id="password-input">
+            <input type="password" id="password-input" >
 
             <label for="RepeatPassword">Repeat password</label>
-            <input type="password" id="repeat-input">
+            <input type="password" id="repeat-input" >
+
+            <p id="error-msg"></p>
 
             <div class="spacer"></div>
             <button class="secondary" id="continue-btn">Continue <span class="material-icons no-height">arrow_right_alt</span></button>
             <div class="spacer"></div>
             <p class="note">Already have an account? <a href="/login" class="black">Log in here</a>.</p>
-        <!-- </form>  -->
+        </form> 
         <p class="tiny-footer">© Oliver, 2022. All rights reserved.</p>
     </div>
 </body>

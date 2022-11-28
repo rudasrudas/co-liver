@@ -11,18 +11,27 @@
     <link rel="stylesheet" href="/style/style.css">
 
     <script src="/script/setup.js"></script>
+    <script src="/script/alerts.js"></script>
+    <script src="/script/loading.js"></script>
+    <script src="/login/login.js"></script>
 </head>
 <body class="single-view">
     <div class="single-content">
         <img src="/img/oliver-logo.png" alt="Oliver logo" class="main-logo">
-        <form action="" class="form-block">
+        <form onsubmit="return loginUser()" class="form-block">
             <h1>Log in</h1>
+            
             <label for="Email">Email</label>
             <input type="text" id="email-input">
+
             <label for="Password">Password</label>
             <input type="password" id="password-input">
+
+            <p id="error-msg"></p>
+
             <div class="spacer"></div>
             <button class="secondary" id="login-btn">Log in <span class="material-icons no-height">arrow_right_alt</span></button>
+
             <div class="spacer"></div>
             <p class="note">Don't have an account yet? <a href="/signup" class="black">Register here</a>.</p>
         </form>
