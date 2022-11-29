@@ -589,3 +589,17 @@ p.note {
     pointer-events: none;
     user-select: none;
 }
+
+/* USER AUTHENTICATION */
+
+.unauth-user {
+
+}
+
+.auth-user {
+
+}
+
+.hidden {
+    display: none;
+}

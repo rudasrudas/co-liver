@@ -3,6 +3,19 @@ window.onload = () => {
     const alerts = document.createElement("div");
     alerts.id = "alerts";
     document.body.appendChild(alerts);
+
+    // Adjust for logged in users
+    document.querySelectorAll('.auth-user').forEach((element) => { element.classList.add('hidden'); });
+    authenticateUser(true, function(){
+        document.querySelectorAll('.unauth-user').forEach((element) => { element.classList.add('hidden'); });
+        document.querySelectorAll('.auth-user').forEach((element) => { element.classList.remove('hidden'); });
+    });
+
+    //Logout functionality
+    document.querySelector('#logout').addEventListener('click', () => {
+        window.localStorage.setItem('userAuth', null);
+        location.href = '/';
+    })
 }
 
 function sendMessage(){

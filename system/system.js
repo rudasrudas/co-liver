@@ -1,3 +1,5 @@
+redirectUnauthenticatedUser();
+
 window.onload = () => {
     //Details
     document.querySelector(".main-logo").addEventListener('click', () => location.href = "/");

@@ -1,4 +1,4 @@
-if (window.localStorage.getItem('userAuth')) location.href = '/system';
+redirectAuthenticatedUser();
 
 window.onload = () => {
     document.querySelector(".main-logo").addEventListener('click', () => location.href = "/");
@@ -42,8 +42,9 @@ function loginUser(){
     } else {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://45.80.152.150/login', true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("x-access-token", window.localStorage.getItem('userAuth'));
+        xhr.allowJson();
+        xhr.addToken();
+        xhr.setStandardTimeout();
         xhr.onload = function() {
             if (xhr.status === 200) {
                 window.localStorage.setItem('userAuth', JSON.parse(xhr.response).token);
