@@ -40,6 +40,9 @@ function registerUser(){
     } else if(!jsonBody.email.includes('@')){
         clearPass();
         showError('#error-msg', "Email is invalid");
+    } else if(passInput.value.length < 10){
+        clearPass();
+        showError('#error-msg', "Password must be at least 10 characters long");
     } else if(passInput.value !== copyInput.value){
         clearPass();
         showError('#error-msg', "Passwords must match");

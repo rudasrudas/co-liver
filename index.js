@@ -16,6 +16,13 @@ window.onload = () => {
         window.localStorage.setItem('userAuth', null);
         location.href = '/';
     })
+
+    //Passed message
+    const message = new URLSearchParams(window.location.search).get('message');
+    const msgType = new URLSearchParams(window.location.search).get('type');
+    if(message) {
+        inform(message, msgType);
+    }
 }
 
 function sendMessage(){

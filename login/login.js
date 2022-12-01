@@ -8,6 +8,7 @@ window.onload = () => {
     alerts.id = "alerts";
     document.body.appendChild(alerts);
 
+    //Passed message
     const message = new URLSearchParams(window.location.search).get('message');
     const msgType = new URLSearchParams(window.location.search).get('type');
     if(message) {

@@ -1,5 +1,7 @@
 redirectUnauthenticatedUser();
 
+getOverview();
+
 window.onload = () => {
     //Details
     document.querySelector(".main-logo").addEventListener('click', () => location.href = "/");
@@ -39,4 +41,24 @@ window.onload = () => {
         window.localStorage.setItem('userAuth', null);
         location.href = '/';
     })
+}
+
+function getOverview() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'http://45.80.152.150/overview', true);
+    xhr.allowJson();
+    xhr.addToken();
+    xhr.setStandardTimeout();
+    xhr.onload = function() {
+        if((xhr.status === 200)){
+            const balance = JSON.parse(xhr.response).balance;
+            const households = JSON.parse(xhr.response).households;
+            const expenses = JSON.parse(xhr.response).expenses;
+
+            console.log(balance);
+            console.log(households);
+            console.log(expenses);
+        }
+    };
+    xhr.send();
 }
