@@ -6,30 +6,7 @@ window.onload = () => {
     //Details
     document.querySelector(".main-logo").addEventListener('click', () => location.href = "/");
 
-    //Browsing logic
-    const active = 'active';
-    const menuBtns = document.querySelectorAll("#navigation > p");
-    const pages = document.querySelectorAll("#system-content > .page");
-
-    Array.from(menuBtns).forEach(e => {
-        e.addEventListener('click', f => {
-            Array.from(menuBtns).forEach(g => g.classList.remove(active));
-            Array.from(pages).forEach(g => g.classList.remove(active));
-            e.classList.add(active);
-            let activePage = null;
-            switch(e.id){
-                case 'overview-link': activePage = '#overview'; break;
-                case 'household-link': activePage = '#household'; break;
-                case 'cohabitants-link': activePage = '#cohabitants'; break;
-                case 'settings-link': activePage = '#settings'; break;
-                default: break;
-            }
-            if(activePage) document.querySelector(activePage).classList.add(active);
-        })
-    });
-
-    menuBtns[0].classList.add(active);
-    pages[0].classList.add(active);
+    
 
     // Enable alerts
     const alerts = document.createElement("div");
@@ -43,6 +20,24 @@ window.onload = () => {
     })
 }
 
+function initChangePage(btnElement){
+    const active = 'active';
+    const menuBtns = document.querySelectorAll("#navigation > p");
+    const pages = document.querySelectorAll("#system-content > .page");
+
+    btnElement.addEventListener('click', f => {
+        Array.from(menuBtns).forEach(g => g.classList.remove(active));
+        Array.from(pages).forEach(g => g.classList.remove(active));
+        btnElement.classList.add(active);
+        let activePage = null;
+        if(btnElement.id === 'overview-link') activePage = '#overview';
+        else if(btnElement.id === 'settings-link') activePage = '#settings';
+        else activePage = `#system-content .page[data-id=${btnElement.dataset.id}]`;
+        
+        if(activePage) document.querySelector(activePage).classList.add(active);
+    })
+}
+
 function getOverview() {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', 'http://45.80.152.150/overview', true);
@@ -51,13 +46,71 @@ function getOverview() {
     xhr.setStandardTimeout();
     xhr.onload = function() {
         if((xhr.status === 200)){
+            
+            //Handle balance
             const balance = JSON.parse(xhr.response).balance;
+            
+            //Handle household data
             const households = JSON.parse(xhr.response).households;
+            households.forEach(addHouseholdUI); //Add as elements
+            
+            //Handle expenses and their data
             const expenses = JSON.parse(xhr.response).expenses;
 
-            console.log(balance);
-            console.log(households);
-            console.log(expenses);
+            //Browsing logic
+            const overviewBtn = document.querySelector('#overview-link');
+            const settingsBtn = document.querySelector('#settings-link');
+            initChangePage(overviewBtn);
+            initChangePage(settingsBtn);
+
+            //Show overview by default
+            overviewBtn.classList.add('active');
+            document.querySelector('#overview').classList.add('active');
+        }
+    };
+    xhr.send();
+}
+
+function addHouseholdUI(household) {
+    //Page
+    const pages = document.querySelector('#system-content');
+
+    const divHouseholdPage = document.createElement('div');
+    divHouseholdPage.classList.add('page');
+    divHouseholdPage.dataset.id = household.hhid;
+    divHouseholdPage.innerHTML = `<h2 class="page-title">${household.name}</h2>`;
+    pages.appendChild(divHouseholdPage);
+
+    //Navigation
+    const nav = document.querySelector('#navigation');
+    const settings = document.querySelector('#settings-link');
+
+    const pHouseholdElement = document.createElement('p');
+    pHouseholdElement.dataset.id = household.hhid;
+    pHouseholdElement.innerHTML = '<span class="material-icons icn">home</span> ' + household.name;
+    initChangePage(pHouseholdElement); //Click functionality
+
+    const ulHouseholdElement = document.createElement('ul');
+    household.users.forEach((user) => {
+        const liHouseholdElement = document.createElement('li');
+        liHouseholdElement.innerHTML = '<span class="material-icons icn">chevron_right</span>' + user.name + ' ' + user.surname;
+        liHouseholdElement.dataset.id = user.uid;
+        ulHouseholdElement.appendChild(liHouseholdElement);
+    });
+
+    nav.insertBefore(pHouseholdElement, settings);
+    nav.insertBefore(ulHouseholdElement, settings);
+}
+
+function getSettings() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'http://45.80.152.150/personal-info', true);
+    xhr.allowJson();
+    xhr.addToken();
+    xhr.setStandardTimeout();
+    xhr.onload = function() {
+        if((xhr.status === 200)){
+            
         }
     };
     xhr.send();
