@@ -20,12 +20,13 @@ window.onload = () => {
     })
 }
 
-function initChangePage(btnElement){
+function initChangePage(btnElement, functionality){
     const active = 'active';
     const menuBtns = document.querySelectorAll("#navigation > p");
     const pages = document.querySelectorAll("#system-content > .page");
 
-    btnElement.addEventListener('click', f => {
+    btnElement.addEventListener('click', () => {
+        functionality();
         Array.from(menuBtns).forEach(g => g.classList.remove(active));
         Array.from(pages).forEach(g => g.classList.remove(active));
         btnElement.classList.add(active);
@@ -44,9 +45,15 @@ function getOverview() {
     xhr.allowJson();
     xhr.addToken();
     xhr.setStandardTimeout();
+    xhr.setError();
     xhr.onload = function() {
         if((xhr.status === 200)){
             
+            //Handle user info
+            const user = JSON.parse(xhr.response).user;
+            const userNameElement = document.querySelector('#account-name');
+            userNameElement.innerText = user.name + ' ' + user.surname;
+
             //Handle balance
             const balance = JSON.parse(xhr.response).balance;
             
@@ -60,8 +67,8 @@ function getOverview() {
             //Browsing logic
             const overviewBtn = document.querySelector('#overview-link');
             const settingsBtn = document.querySelector('#settings-link');
-            initChangePage(overviewBtn);
-            initChangePage(settingsBtn);
+            // initChangePage(overviewBtn, getOverview);
+            initChangePage(settingsBtn, getSettings);
 
             //Show overview by default
             overviewBtn.classList.add('active');
@@ -93,7 +100,7 @@ function addHouseholdUI(household) {
     const ulHouseholdElement = document.createElement('ul');
     household.users.forEach((user) => {
         const liHouseholdElement = document.createElement('li');
-        liHouseholdElement.innerHTML = '<span class="material-icons icn">chevron_right</span>' + user.name + ' ' + user.surname;
+        liHouseholdElement.innerHTML = '<span class="material-icons icn-mini">chevron_right</span>' + user.name + ' ' + user.surname;
         liHouseholdElement.dataset.id = user.uid;
         ulHouseholdElement.appendChild(liHouseholdElement);
     });
@@ -108,10 +115,16 @@ function getSettings() {
     xhr.allowJson();
     xhr.addToken();
     xhr.setStandardTimeout();
+    xhr.setError();
     xhr.onload = function() {
         if((xhr.status === 200)){
-            
+            const resp = JSON.parse(xhr.response);
+            document.querySelector('#pi-email').value = resp.user.email;
+            document.querySelector('#pi-name').value = resp.user.name;
+            document.querySelector('#pi-surname').value = resp.user.surname;
+
+            document.querySelector('#pi-income').value = resp.user.estimatedMonthlyIncome;
         }
     };
     xhr.send();
-}
+}   

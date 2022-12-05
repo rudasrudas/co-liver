@@ -21,28 +21,12 @@
         <img src="/img/oliver-logo.png" alt="Oliver logo" class="main-logo">
         <div id="menu" class="info-shadow">
             <div class="account-info">
-                <h3 id="account-name">Justas</h3>
+                <h3 id="account-name"></h3>
                 <span class="material-icons logout icn-18" id="logout">logout</span>
             </div>
             <div id="navigation">
                 <p id="overview-link"><span class="material-icons icn">star</span> Overview</p>
-                <br>
-                <!-- <p id="household-link"><span class="material-icons icn">home</span> My home</p>
-                <ul>
-                    <li><span class="material-icons icn">chevron_right</span>Michael</li>
-                    <li><span class="material-icons icn">chevron_right</span>Phyllis</li>
-                    <li><span class="material-icons icn">chevron_right</span>Angela</li>
-                    <li><span class="material-icons icn">chevron_right</span>Jim</li>
-                    <li><span class="material-icons icn">chevron_right</span>Pam</li>
-                    <li><span class="material-icons icn">chevron_right</span>Oscar</li>
-                </ul>
-                <p id="cohabitants-link"><span class="material-icons icn">home</span> Roskildevej</p>
-                <ul>
-                    <li><span class="material-icons icn">chevron_right</span>Dwight</li>
-                    <li><span class="material-icons icn">chevron_right</span>Kevin</li>
-                    <li><span class="material-icons icn">chevron_right</span>Stanley</li>
-                    <li><span class="material-icons icn">chevron_right</span>Gabe</li>
-                </ul> -->
+                <!-- <br> -->
                 <p id="settings-link"><span class="material-icons icn">settings</span> Settings</p>
             </div>
         </div>
@@ -60,6 +44,53 @@
         </div>
         <div id="settings" class="page">
             <h2 class="page-title">Settings</h2>
+            <form onsubmit="return updatePersonalInfo()" id="settings-form" class="page-form">
+                <div class="page-field w-50">
+                    <label for="Email">Email</label>
+                    <input type="text" id="pi-email" disabled autocomplete="off">
+                </div>
+                <div class="row">
+                    <div class="page-field w-33">
+                        <label for="Name">Name</label>
+                        <input type="text" id="pi-name" autocomplete="off">
+                    </div>
+                    <div class="page-field w-33">
+                        <label for="Surname">Surname</label>
+                        <input type="text" id="pi-surname" autocomplete="off">
+                    </div>
+                </div>
+                
+                <div class="spacer"></div>
+                <div class="spacer"></div>
+
+                <div class="page-field w-50">
+                    <label for="Income">Estimated monthly income</label>
+                    <input type="number" id="pi-income" autocomplete="off">
+                </div>
+                <div class="page-field w-50">
+                    <label for="Password">Current password</label>
+                    <input type="password" id="pi-password" autocomplete="off">
+                </div>
+
+                <div class="spacer"></div>
+                <div class="spacer"></div>
+
+                <div class="row">
+                    <div class="page-field w-33">
+                        <label for="NewPassword">New password</label>
+                        <input type="password" id="pi-new" autocomplete="off">
+                    </div>
+                    <div class="page-field w-33">
+                        <label for="RepeatNewPassword">Repeat new password</label>
+                        <input type="password" id="pi-new-repeat" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+                <div class="spacer"></div>
+                <button class="primary">Save</button>
+                <div class="spacer"></div>
+            </form>
         </div>
     </div>
 </body>

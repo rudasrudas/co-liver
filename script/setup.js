@@ -31,8 +31,14 @@ XMLHttpRequest.prototype.allowJson = function(){
 XMLHttpRequest.prototype.setStandardTimeout = function(){
     this.timeout = 5000;
     this.ontimeout = function () {
-        inform("Failed to connect to the server. Please refresh and try again.", "failure");
+        inform("Server timed out while sending a response. Please refresh and try again.", "failure");
     };
+}
+
+XMLHttpRequest.prototype.setError = function(){
+    this.onerror = function () {
+        inform("Failed to connect to the server. Please try again later.", "failure");
+    }
 }
 
 function authenticateUser(callIf, callback){

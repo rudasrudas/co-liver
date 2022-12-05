@@ -46,6 +46,7 @@ function loginUser(){
         xhr.allowJson();
         xhr.addToken();
         xhr.setStandardTimeout();
+        xhr.setError();
         xhr.onload = function() {
             if (xhr.status === 200) {
                 window.localStorage.setItem('userAuth', JSON.parse(xhr.response).token);

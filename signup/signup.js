@@ -53,6 +53,7 @@ function registerUser(){
         xhr.allowJson();
         xhr.addToken();
         xhr.setStandardTimeout();
+        xhr.setError();
         xhr.onload = function() {
             if (xhr.status === 200) {
                 let msg = 'Registered successfully. Please log in to continue.';

@@ -8,6 +8,7 @@
     --secondary-light-red: #ffd6d6;
     --primary-black: #131313;
     --primary-gray: #a8a8a8;
+    --primary-medium-gray: #dddddd;
     --primary-light-gray: #f7f7f7;
     --primary-white: #ffffff;
     --primary-transparent-white: #ffffff40;
@@ -96,6 +97,17 @@ body {
 
 #contact-form {
     display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#contact-form > * {
+    width: 100%;
+}
+
+#contact-form button {
+    min-width: 30%;
+    align-self: flex-end;
 }
 
 #letter {
@@ -218,13 +230,12 @@ form input, form textarea {
     resize: none;
 }
 
-form .spacer {
-    margin-top: 15px;
+input:disabled {
+    background-color: var(--primary-medium-gray) !important;
 }
 
-form button {
-    min-width: 30%;
-    align-self: flex-end;
+form .spacer {
+    margin-top: 15px;
 }
 
 input:-webkit-autofill{

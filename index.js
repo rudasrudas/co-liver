@@ -40,7 +40,9 @@ function sendMessage(){
     else {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://45.80.152.150/send-message', true);
-        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.allowJson();
+        xhr.setStandardTimeout();
+        xhr.setError();
         xhr.onload = function() {
             if (xhr.status === 200) {
                 inform("Message was sent successfully!", "success");
@@ -52,10 +54,10 @@ function sendMessage(){
                 inform("Unknown error occured. Server might be down.\nPlease refresh and try again later", "failure");
             }
     
-            document.querySelector('form').stopLoading();
+            document.querySelector('form').parentElement.stopLoading();
         };
         xhr.send(JSON.stringify(json));
-        document.querySelector('form').startLoading();
+        document.querySelector('form').parentElement.startLoading();
     }
 
     return false;

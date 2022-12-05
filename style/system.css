@@ -6,6 +6,10 @@
     height: 100vh;
 }
 
+#system::-webkit-scrollbar {
+    display: none;
+}
+
 #sidebar {
     width: 150px;
     height: 100vh;
@@ -13,6 +17,7 @@
     display: flex;
     flex-direction: column;
     flex: 0 1 auto;
+    position: fixed;
 }
 
 #menu {
@@ -60,17 +65,19 @@
 #account-name {
     /* margin: 5px 0px; */
     width: 75px;
-    text-align: center;
+    text-align: left;
     display: flex;
     flex-direction: row;
     font-size: 16px;
+    margin-top: 3px;
 }
 
 .logout {
     cursor: pointer;
     user-select: none;
-    border-radius: 100px;
-    padding: 3px 1px 3px 5px;
+    border-radius: 5px;
+    padding: 3px 2px 3px 4px;
+    height: fit-content;
 }
 
 .icn-18 {
@@ -79,29 +86,41 @@
 }
 
 .icn {
-    vertical-align: top;
+    display: inline-flex !important;
+    vertical-align: middle !important;
+    line-height: 1.1 !important;
+    font-size: 16px !important;
+    padding-right: 3px;
+}
+
+.icn-mini {
+    display: inline-flex !important;
+    vertical-align: middle !important;
+    line-height: 1.1 !important;
     font-size: 16px !important;
 }
 
 #navigation {
     font-size: 14px;
-    margin: 15px 0px 0px 0px;
+    margin: 5px 0px 0px 0px;
 }
 
 #navigation > p, #navigation > ul > * {
     user-select: none;
     cursor: pointer;
-    line-height: 1.8;
-    padding: 0px 5px;
+    line-height: 1.3;
+    padding: 3px 5px;
     margin: 0px -5px;
     width: fit-content;
     border-radius: 5px;
+    display: inline-flex;
+    vertical-align: middle;
 }
 
 #navigation > ul > li {
     line-height: 1.3;
     margin-left: 10px;
-    width: fit-content;
+    padding: 3px 5px;
     display: flex;
     flex-direction: row;
     font-style: italic;
@@ -132,6 +151,7 @@
     height: auto;
     min-height: 100px;
     margin-top: 15px;
+    margin-left: 165px;
     width: 100%;
     /* background-color: var(--primary-light-gray); */
 }
@@ -148,4 +168,34 @@
 .page > .page-title {
     font-size: 24px;
     margin-top: 60px;
+}
+
+.page-form {
+    display: inline-flex;
+    /* flex-direction: row;
+    flex-wrap: wrap; */
+}
+
+.page-form .page-field {
+    display: flex;
+    flex-direction: column;
+    padding-left: 15px;
+    width: 100%;
+}
+
+.page-form .row {
+    display: flex;
+    flex-direction: row;
+}
+
+.page-form .w-33 {
+    width: 33%;
+}
+
+.page-form .w-50 {
+    width: 50%;
+}
+
+.page-form .w-25 {
+    width: 25%;
 }
