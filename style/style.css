@@ -105,11 +105,6 @@ body {
     width: 100%;
 }
 
-#contact-form button {
-    min-width: 30%;
-    align-self: flex-end;
-}
-
 #letter {
     background-image: url(/img/letter.jpg);
     background-size: cover;
@@ -191,7 +186,7 @@ span.material-icons.no-height {
     line-height: 0.2;
 }
 
-form {
+form, .page-form {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -212,7 +207,34 @@ form {
     width: 50%;
 }
 
-form label {
+.checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background-color: var(--primary-white);
+    margin: 5px 5px 5px 0px;
+    user-select: none;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px !important;
+    border: solid 2px var(--primary-black);
+    color: var(--primary-white);
+}
+
+.checkbox.active {
+    background-color: var(--primary-red);
+    color: var(--primary-white);
+    border: solid 2px var(--primary-red);
+}
+
+.checkbox-label {
+    font-size: 13px;
+    margin: 5px 0px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+form label, .page-form label {
     text-transform: uppercase;
     font-size: 12px;
     font-weight: bold;
@@ -220,7 +242,7 @@ form label {
     margin-bottom: 5px;
 }
 
-form input, form textarea {
+form input, form textarea, .page-form input, .page-form textarea{
     background-color: var(--primary-white) !important;
     color: var(--primary-black);
     font-size: 15px;
@@ -234,8 +256,17 @@ input:disabled {
     background-color: var(--primary-medium-gray) !important;
 }
 
-form .spacer {
+form .spacer, .page-form .spacer {
     margin-top: 15px;
+}
+
+form .spacer-2, .page-form .spacer-2 {
+    margin-top: 30px;
+}
+
+form button, .page-form button {
+    min-width: 30%;
+    align-self: flex-end;
 }
 
 input:-webkit-autofill{

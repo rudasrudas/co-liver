@@ -93,6 +93,11 @@
     padding-right: 3px;
 }
 
+.inline-icn {
+    display: inline-flex !important;
+    vertical-align: middle !important;
+}
+
 .icn-mini {
     display: inline-flex !important;
     vertical-align: middle !important;
@@ -170,6 +175,20 @@
     margin-top: 60px;
 }
 
+.page .page-subtitle {
+    font-size: 18px;
+    margin-top: 30px;
+} 
+
+.fade-scroll {
+    width: 100%;
+    height: 80px;
+    position: fixed;
+    margin-top: -20px;
+    z-index: 2;
+    background-image: linear-gradient(to bottom, #fff 30%, #fff0);
+}
+
 .page-form {
     display: inline-flex;
     /* flex-direction: row;
@@ -179,7 +198,7 @@
 .page-form .page-field {
     display: flex;
     flex-direction: column;
-    padding-left: 15px;
+    padding-right: 15px;
     width: 100%;
 }
 
@@ -198,4 +217,62 @@
 
 .page-form .w-25 {
     width: 25%;
+}
+
+/* Settings page Household block */
+
+.hh-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+} 
+
+.hh-block {
+    width: 47%;
+    /* min-height: 100px; */
+    background-color: var(--primary-light-gray);
+    border: solid 2px var(--primary-black);
+    box-shadow: 3px 3px var(--primary-gray);
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 15px;
+    position: relative;
+}
+
+.hh-block .hh-name {
+    font-size: 20px;
+    /* font-style: italic; */
+    font-weight: bolder;
+}
+
+.hh-block .hh-id {
+    color: var(--primary-gray);
+    text-transform: uppercase;
+    font-style: italic;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+
+.hh-block .hh-leave {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: var(--primary-black);
+    display: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+.hh-block:hover {
+    box-shadow: 3px 3px var(--primary-black);
+}
+
+.hh-block:hover .hh-leave {
+    display: block;
+}
+
+.hh-block .hh-leave:hover {
+    color: var(--primary-red);
 }
