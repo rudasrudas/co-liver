@@ -62,32 +62,3 @@ function sendMessage(){
 
     return false;
 }
-
-function subscribe() {
-    try{
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://45.80.152.150/newsletter', true);
-        xhr.allowJson();
-        xhr.setStandardTimeout();
-        xhr.setError();
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                inform("Successfully subscribed to the newsletter!", "success");
-            }
-            else if (xhr.status === 400){
-                inform("Server failed to process the subscription. Please try again later", "failure");
-            }
-            else {
-                inform("Unknown error occured. Server might be down.\nPlease refresh and try again later", "failure");
-            }
-        };
-        const json = {
-            "email": document.querySelector('#newsletter-input').value
-        }
-        xhr.send(JSON.stringify(json));
-    } catch (err) {
-        return false;
-    }
-
-    return false;
-}

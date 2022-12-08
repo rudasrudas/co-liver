@@ -33,6 +33,11 @@
     </div>
     <div id="system-content">
         <div class="fade-scroll"></div>
+        <div id="loading-page" class="page">
+            <div>
+                <div></div>
+            </div>
+        </div>
         <div id="overview" class="page">
             <h2 class="page-title">Overview</h2>
         </div>
@@ -68,18 +73,19 @@
                     <p class="checkbox-label">Receive our email newsletter with tips on saving, managing a household with your roommates and more!</p>
                 </div>
 
-                <h3 class="page-subtitle hh-title">Households</h3>
-                <div class="spacer"></div>
-                <div class="hh-container"></div>
-
-                <div class="spacer-2"></div>
+                <div id="hh-wrapper">
+                    <h3 class="page-subtitle hh-title">Households</h3>
+                    <div class="spacer"></div>
+                    <div class="hh-container"></div>
+                    <div class="spacer-2"></div>
+                </div>
 
                 <h3 class="page-subtitle">Change password</h3>
                 <div class="spacer"></div>
 
                 <div class="page-field w-50">
                     <label for="Password">Current password</label>
-                    <input type="password" id="pi-password" autocomplete="off" required>
+                    <input type="password" id="pi-password" autocomplete="off">
                 </div>
 
                 <div class="row">
@@ -92,6 +98,8 @@
                         <input type="password" id="pi-new-repeat" autocomplete="new-password-repeat">
                     </div>
                 </div>
+                
+                <p id="error-msg"></p>
 
                 <div class="spacer-2"></div>
                 <button class="primary">Save</button>

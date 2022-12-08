@@ -276,3 +276,19 @@
 .hh-block .hh-leave:hover {
     color: var(--primary-red);
 }
+
+/* Loading page */
+
+#loading-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#loading-page > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
