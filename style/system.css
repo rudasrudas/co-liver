@@ -124,7 +124,7 @@
 
 #navigation > ul > li {
     line-height: 1.3;
-    margin-left: 10px;
+    margin-left: 6px;
     padding: 3px 5px;
     display: flex;
     flex-direction: row;
@@ -170,15 +170,27 @@
     display: block;
 }
 
-.page > .page-title {
+.page .page-title {
     font-size: 24px;
-    margin-top: 60px;
+}
+
+.page .page-top-margin {
+    margin-top: 65px;
+}
+
+.spaced-out {
+    justify-content: space-between;
 }
 
 .page .page-subtitle {
     font-size: 18px;
     margin-top: 30px;
+    font-style: italic;
 } 
+
+.page .page-subtitle.no-margin {
+    margin: 0px;
+}
 
 .fade-scroll {
     width: 100%;
@@ -202,9 +214,21 @@
     width: 100%;
 }
 
-.page-form .row {
+.row {
     display: flex;
     flex-direction: row;
+}
+
+.gap-10 {
+    gap: 10px;
+}
+
+.gap-15 {
+    gap: 15px;
+}
+
+.align-end {
+    align-items: flex-end;
 }
 
 .page-form .w-33 {
@@ -291,4 +315,39 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+}
+/* Household page */
+
+.user-overview .user, .expenses .expense {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: nowrap;
+    padding: 5px 5px;
+    border-radius: 15px;
+}
+
+.user-overview .user, .user-overview .user > .row, .expenses .expense, .expenses .expense > .row {
+    display: flex;
+    align-items: center;
+}
+
+.user-overview .user:hover, .expenses .expense:hover {
+    background-color: var(--primary-light-gray);
+}
+
+.user-overview .face, .expense .expense-icon {
+    font-size: 40px !important;
+    user-select: none;
+}
+
+.user-overview .balance, .expenses .amount {
+    font-weight: bold;
+}
+
+.user-overview .dots, .expenses .dots {
+    font-size: 20px !important;
+    user-select: none;
+    cursor: pointer;
 }

@@ -3,8 +3,8 @@ function subscribe() {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://45.80.152.150/newsletter', true);
         xhr.allowJson();
-        xhr.setStandardTimeout();
-        xhr.setError();
+        xhr.setStandardTimeout('#newsletter-block');
+        xhr.setError('#newsletter-block');
         xhr.onload = function() {
             if (xhr.status === 200) {
                 inform("Successfully subscribed to the newsletter!", "success");
@@ -20,6 +20,7 @@ function subscribe() {
             "email": document.querySelector('#newsletter-input').value
         }
         xhr.send(JSON.stringify(json));
+        document.querySelector('#newsletter-block').startLoading();
     } catch (err) {
         return false;
     }

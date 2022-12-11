@@ -8,6 +8,7 @@
     --secondary-light-red: #ffd6d6;
     --primary-black: #131313;
     --primary-gray: #a8a8a8;
+    --primary-dark-gray: #797979;
     --primary-medium-gray: #dddddd;
     --primary-light-gray: #f7f7f7;
     --primary-white: #ffffff;
@@ -256,11 +257,15 @@ input:disabled {
     background-color: var(--primary-medium-gray) !important;
 }
 
-form .spacer, .page-form .spacer {
+.spacer-small {
+    margin-top: 5px;
+}
+
+.spacer {
     margin-top: 15px;
 }
 
-form .spacer-2, .page-form .spacer-2 {
+.spacer-2 {
     margin-top: 30px;
 }
 
@@ -302,6 +307,10 @@ input:-webkit-autofill{
     justify-content: stretch;
     gap: 15px;
     width: 100%;
+}
+
+.info.column {
+    flex-direction: column;
 }
 
 .info-title {
@@ -404,6 +413,7 @@ button.primary, a.primary {
     padding: 10px 15px;
     margin: 0px;
     border-radius: 15px;
+    border: solid 2px var(--primary-red);
     background-color: var(--primary-red);
     color: var(--primary-black);
     border: none;
@@ -446,6 +456,17 @@ button.secondary:hover, a.secondary:hover {
 button.secondary:active, a.secondary:active {
     box-shadow: none;
     margin: 3px -3px -3px 3px;
+}
+
+button.small, a.small {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+button.primary.small {
+    border: solid 2px var(--primary-red);
 }
 
 .shadow {
@@ -622,9 +643,8 @@ p.note {
     animation: spin 1s infinite linear;
     z-index: 2;
     user-select: none;
-    /* display: flex;
-    justify-self: center;
-    align-self  : center; */
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .unclickable {
@@ -643,5 +663,12 @@ p.note {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+/* CHARTS */
+
+.chart {
+    width: 100%;
+    min-height: 200px;
 }

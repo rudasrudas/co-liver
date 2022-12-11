@@ -1,8 +1,8 @@
 redirectUnauthenticatedUser();
 
-getOverview(true);
-
 window.onload = () => {
+
+    getOverview(true);
     
     //Start the loading page
     document.querySelector('#loading-page > div > div').startLoading();
@@ -35,7 +35,8 @@ function initChangePage(btnElement, functionality, customLoading){
         let activePage = null;
         if(btnElement.id === 'overview-link') activePage = '#overview';
         else if(btnElement.id === 'settings-link') activePage = '#settings';
-        else activePage = `#system-content .page[data-id=${btnElement.dataset.id}]`;
+        else activePage = `#system-content #household-template`;
+        // else activePage = `#system-content .page[data-id='${btnElement.dataset.id}']`;
         
         if(activePage && !customLoading) document.querySelector(activePage).classList.add(active);
     });
@@ -63,6 +64,21 @@ function initOverviewFunctionality(res){
     initChangePage(overviewBtn, getOverview);
     initChangePage(settingsBtn, getSettings, true);
 
+    //Handle overview page
+    const data = {
+        header: ["Name", "Death toll"],
+        rows: [
+            ["San-Francisco (1906)", 1500],
+            ["Messina (1908)", 87000],
+            ["Ashgabat (1948)", 175000],
+            ["Chile (1960)", 10000],
+            ["Tian Shan (1976)", 242000],
+            ["Armenia (1988)", 25000],
+            ["Iran (1990)", 50000]
+        ]
+    };
+    setupCategoryChart('.chart', data);
+
     //Show overview by default
     overviewBtn.classList.add('active');
     document.querySelector('#overview').classList.add('active');
@@ -78,7 +94,8 @@ function getOverview(initializeFunctionality) {
     xhr.onload = function() {
         if((xhr.status === 200)){
             if(initializeFunctionality) 
-                initOverviewFunctionality(xhr.response);
+            initOverviewFunctionality(xhr.response);
+            window.localStorage.setItem("userId", JSON.parse(xhr.response).user.uid);
         }
     };
     xhr.send();
@@ -106,7 +123,8 @@ function addHouseholdNavigationUI(household) {
     const ulHouseholdElement = document.createElement('ul');
     household.users.forEach((user) => {
         const liHouseholdElement = document.createElement('li');
-        liHouseholdElement.innerHTML = '<span class="material-icons icn-mini">chevron_right</span>' + user.name + ' ' + user.surname;
+        const lastName = user.surname ? user.surname.charAt(0) : '';
+        liHouseholdElement.innerHTML = '<span class="material-icons icn-mini">chevron_right</span>' + user.name + ' ' + lastName;
         liHouseholdElement.dataset.id = user.uid;
         ulHouseholdElement.appendChild(liHouseholdElement);
     });
@@ -142,8 +160,14 @@ function updateSettingsUI(res) {
     document.querySelector('#pi-income').value = res.estimatedMonthlyIncome;
 
     const newsletterCheckbox = document.querySelector('#pi-newsletter');
+
+    if(res.newsletter){
+        newsletterCheckbox.classList.add('active');
+        newsletterCheckbox.dataset.checked = 'true';
+    }
+
     newsletterCheckbox.addEventListener('click', () => {
-        if(newsletterCheckbox.dataset.checked == 'true'){
+        if(newsletterCheckbox.dataset.checked === 'true'){
             newsletterCheckbox.classList.remove('active');
             newsletterCheckbox.dataset.checked = 'false';
         }
@@ -152,11 +176,6 @@ function updateSettingsUI(res) {
             newsletterCheckbox.dataset.checked = 'true';
         }
     });
-
-    if(res.newsletter){
-        newsletterCheckbox.classList.add('active');
-        newsletterCheckbox.dataset.checked = 'true';
-    }
 
     const hhContainer = document.querySelector('#settings .hh-container');
     while(hhContainer.firstChild) hhContainer.removeChild(hhContainer.firstChild);
@@ -174,7 +193,11 @@ function updateSettingsUI(res) {
         hhBlock.querySelector('.hh-room-size').disabled = !hh.canEdit;
         if(!hh.canLeave) hhBlock.querySelector('.hh-leave').style.display = 'none';
         hhBlock.querySelector('.hh-leave').addEventListener('click', () => {
-            if(hh.canLeave) leaveHousehold(hh.hhid);
+            if(hh.canLeave){
+                if(confirm(`You're about to leave ${hh.name} household.\nAre you sure you intend to do so?`)){
+                    leaveHousehold(hh.hhid, window.localStorage.getItem("userId"));
+                }
+            } 
         });
         hhContainer.appendChild(hhBlock);
     });
@@ -251,4 +274,26 @@ function finishLoadingPage(pageToOpen){
     const pages = document.querySelectorAll("#system-content > .page");
     Array.from(pages).forEach(g => g.classList.remove('active'));    
     document.querySelector(pageToOpen).classList.add('active');
+}
+
+function leaveHousehold(hhid, uid){
+    const xhr = new XMLHttpRequest();
+    xhr.open('DELETE', `http://45.80.152.150/household/${hhid}/user/${uid}`, true);
+    xhr.allowJson();
+    xhr.addToken();
+    xhr.setStandardTimeout();
+    xhr.setError();
+    xhr.onload = function() {
+        if(xhr.status === 200){
+            getOverview();
+            getSettings();
+        }
+        else if (xhr.status === 430){
+            showError('#error-msg', xhr.response);
+        }
+        else {
+            inform(xhr.response, "failure");
+        }
+    };
+    xhr.send();
 }

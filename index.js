@@ -41,8 +41,8 @@ function sendMessage(){
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://45.80.152.150/send-message', true);
         xhr.allowJson();
-        xhr.setStandardTimeout();
-        xhr.setError();
+        xhr.setStandardTimeout('form');
+        xhr.setError('form');
         xhr.onload = function() {
             if (xhr.status === 200) {
                 inform("Message was sent successfully!", "success");

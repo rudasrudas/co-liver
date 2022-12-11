@@ -52,8 +52,8 @@ function registerUser(){
         xhr.open('POST', 'http://45.80.152.150/register', true);
         xhr.allowJson();
         xhr.addToken();
-        xhr.setStandardTimeout();
-        xhr.setError();
+        xhr.setStandardTimeout('form');
+        xhr.setError('form');
         xhr.onload = function() {
             if (xhr.status === 200) {
                 let msg = 'Registered successfully. Please log in to continue.';

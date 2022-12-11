@@ -15,6 +15,8 @@
     <script src="/script/alerts.js"></script>
     <script src="/script/loading.js"></script>
     <script src="/system/system.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
+    <script src="/script/chart.js"></script>
 </head>
 <body class="master-margin" id="system">
     <div id="sidebar">
@@ -39,10 +41,101 @@
             </div>
         </div>
         <div id="overview" class="page">
+            <div class="page-top-margin"></div>
             <h2 class="page-title">Overview</h2>
+            <div id="chart"></div>
+        </div>
+        <div id="household-template" class="page">
+            <div class="page-top-margin"></div>
+            <div class="row spaced-out">
+                <h2 class="page-title">Household name</h2>
+                <div class="row gap-15">
+                    <button class="page-top-btn primary small"><span class="material-icons icn">show_chart</span> Settle</button>
+                    <button class="page-top-btn secondary small"><span class="material-icons icn">person_add</span> Invite</button>
+                    <button class="page-top-btn secondary small">More <span class="material-icons icn">arrow_drop_down</span></button>
+                    <!-- <button class="page-top-btn secondary small"><span class="material-icons icn">logout</span> Leave</button>
+                    <button class="page-top-btn secondary small"><span class="material-icons icn">delete_forever</span> Delete</button> -->
+                </div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <h3 class="page-subtitle">Users</h3>
+            <ul class="user-overview">
+                <li class="user">
+                    <div class="row gap-10">
+                        <span class="material-icons face">face</span>
+                        <p class="full-name">John Doe</p>
+                    </div>
+                    <p class="expense-count">20 Expenses</p>
+                    <div class="row gap-10">
+                        <p class="balance">120 DKK</p>
+                        <span class="material-icons icn dots">more_vert</span>
+                    </div>
+                </li>
+                <li class="user">
+                    <div class="row gap-10">
+                        <span class="material-icons face">face</span>
+                        <p class="full-name">John Doe</p>
+                    </div>
+                    <p class="expense-count">20 Expenses</p>
+                    <div class="row gap-10">
+                        <p class="balance">120 DKK</p>
+                        <span class="material-icons icn dots">more_vert</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="spacer-2"></div>
+            <div class="row spaced-out align-end">
+                <h3 class="page-subtitle no-margin">Recurring expenses</h3>
+                <button class="secondary small"><span class="material-icons icn">add</span> New</button>
+            </div>
+            <div class="spacer-small"></div>
+            <ul id="recurring" class="expenses">
+                <li class="expense">
+                    <div class="row gap-10">
+                        <span class="material-icons expense-icon">payments</span>
+                        <p class="title">Rent</p>
+                    </div>
+                    <p class="payer">John Doe</p>
+                    <p class="payers">3 people</p>
+                    <div class="row gap-10">
+                        <p class="amount">120 DKK</p>
+                        <span class="material-icons icn dots">more_vert</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="spacer-2"></div>
+            <div class="row spaced-out align-end">
+                <h3 class="page-subtitle no-margin">Expenses</h3>
+                <button class="secondary small"><span class="material-icons icn">add</span> New</button>
+            </div>
+            <div class="spacer-small"></div>
+            <ul id="expenses" class="expenses">
+                <li class="expense">
+                    <div class="row gap-10">
+                        <span class="material-icons expense-icon">payments</span>
+                        <p class="title">Rent</p>
+                    </div>
+                    <p class="payer">John Doe</p>
+                    <p class="payers">3 people</p>
+                    <div class="row gap-10">
+                        <p class="amount">120 DKK</p>
+                        <span class="material-icons icn dots">more_vert</span>
+                    </div>
+                </li>
+            </ul>
+
         </div>
         <div id="settings" class="page">
+            <div class="page-top-margin"></div>
             <h2 class="page-title">Settings</h2>
+            
+            <h3 class="page-subtitle">General information</h3>
+            <div class="spacer"></div>
+
             <form onsubmit="return updatePersonalInfo()" id="settings-form" class="page-form">
                 <div class="page-field w-50">
                     <label for="Email">Email</label>
@@ -72,6 +165,8 @@
                     <span class="material-icons checkbox" id="pi-newsletter">checkbox</span>
                     <p class="checkbox-label">Receive our email newsletter with tips on saving, managing a household with your roommates and more!</p>
                 </div>
+                
+                <div class="spacer"></div>
 
                 <div id="hh-wrapper">
                     <h3 class="page-subtitle hh-title">Households</h3>

@@ -45,8 +45,8 @@ function loginUser(){
         xhr.open('POST', 'http://45.80.152.150/login', true);
         xhr.allowJson();
         xhr.addToken();
-        xhr.setStandardTimeout();
-        xhr.setError();
+        xhr.setStandardTimeout('form');
+        xhr.setError('form');
         xhr.onload = function() {
             if (xhr.status === 200) {
                 window.localStorage.setItem('userAuth', JSON.parse(xhr.response).token);
@@ -62,8 +62,8 @@ function loginUser(){
     
             document.querySelector('form').stopLoading();
         };
-        xhr.send(JSON.stringify(jsonBody));
         document.querySelector('form').startLoading();
+        xhr.send(JSON.stringify(jsonBody));
     }
 
     return false;
