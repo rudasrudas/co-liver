@@ -28,10 +28,13 @@ function initChangePage(btnElement, functionality, customLoading){
     const pages = document.querySelectorAll("#system-content > .page");
 
     btnElement.addEventListener('click', () => {
+        showPage('#loading-page');
         functionality();
         Array.from(menuBtns).forEach(g => g.classList.remove(active));
-        Array.from(pages).forEach(g => g.classList.remove(active));
-        btnElement.classList.add(active);
+        if(!customLoading){
+            Array.from(pages).forEach(g => g.classList.remove(active));
+            btnElement.classList.add(active);
+        }
         let activePage = null;
         if(btnElement.id === 'overview-link') activePage = '#overview';
         else if(btnElement.id === 'settings-link') activePage = '#settings';
@@ -61,7 +64,7 @@ function initOverviewFunctionality(res){
     //Browsing logic
     const overviewBtn = document.querySelector('#overview-link');
     const settingsBtn = document.querySelector('#settings-link');
-    initChangePage(overviewBtn, getOverview);
+    initChangePage(overviewBtn, getOverview, true);
     initChangePage(settingsBtn, getSettings, true);
 
     //Handle overview page
@@ -96,6 +99,7 @@ function getOverview(initializeFunctionality) {
             if(initializeFunctionality) 
             initOverviewFunctionality(xhr.response);
             window.localStorage.setItem("userId", JSON.parse(xhr.response).user.uid);
+            showPage('#overview')
         }
     };
     xhr.send();
@@ -143,14 +147,13 @@ function getSettings() {
     xhr.onload = function() {
         if((xhr.status === 200)){
             updateSettingsUI(JSON.parse(xhr.response));
+            showPage('#settings');
         }
     };
     xhr.send();
-}   
+}
 
 function updateSettingsUI(res) {
-    loadPage();
-
     document.querySelector('#account-name').innerText = res.user.name;
 
     document.querySelector('#pi-email').value = res.user.email;
@@ -207,8 +210,6 @@ function updateSettingsUI(res) {
     } else {
         document.querySelector('#hh-wrapper').style.display = 'block';
     }
-
-    finishLoadingPage('#settings');
 }
 
 function updatePersonalInfo(){
@@ -266,11 +267,11 @@ function updatePersonalInfo(){
 
 function loadPage(){
     const pages = document.querySelectorAll("#system-content > .page");
-    Array.from(pages).forEach(g => g.classList.remove('active'));    
+    Array.from(pages).forEach(g => g.classList.remove('active'));
     document.querySelector('#loading-page').classList.add('active');
 }
 
-function finishLoadingPage(pageToOpen){
+function showPage(pageToOpen){
     const pages = document.querySelectorAll("#system-content > .page");
     Array.from(pages).forEach(g => g.classList.remove('active'));    
     document.querySelector(pageToOpen).classList.add('active');
