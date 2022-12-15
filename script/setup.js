@@ -65,3 +65,7 @@ function redirectAuthenticatedUser(){
 async function redirectUnauthenticatedUser(){
     await authenticateUser(false, () => {location.href = '/';});
 }
+
+function logOffUnauthenticated(xhr){
+    if(xhr.status === 401) location.href = '/';
+}

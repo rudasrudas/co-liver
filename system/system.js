@@ -1,5 +1,7 @@
 redirectUnauthenticatedUser();
 
+var backupPage;
+
 window.onload = () => {
 
     getOverview(true);
@@ -38,7 +40,8 @@ function initChangePage(btnElement, functionality, customLoading){
         let activePage = null;
         if(btnElement.id === 'overview-link') activePage = '#overview';
         else if(btnElement.id === 'settings-link') activePage = '#settings';
-        else activePage = `#system-content #household-template`;
+        // else activePage = `#expense`;
+        else activePage = `#system-content #household`;
         // else activePage = `#system-content .page[data-id='${btnElement.dataset.id}']`;
         
         if(activePage && !customLoading) document.querySelector(activePage).classList.add(active);
@@ -56,31 +59,37 @@ function initOverviewFunctionality(res){
 
     //Handle household data
     const households = JSON.parse(res).households;
-    households.forEach(addHouseholdNavigationUI); //Add as elements
+    households.forEach(initHouseholdNavigationUI); //Add as elements
 
     //Handle expenses and their data
     const expenses = JSON.parse(res).expenses;
 
     //Browsing logic
     const overviewBtn = document.querySelector('#overview-link');
+    const addHouseholdBtn = document.querySelector('#add-household-link');
     const settingsBtn = document.querySelector('#settings-link');
     initChangePage(overviewBtn, getOverview, true);
-    initChangePage(settingsBtn, getSettings, true);
+    addHouseholdBtn.addEventListener('click', () => {
+        addHouseholdBtn.popup('Add new household', `
+        <form style="width: 400px" onsubmit="return joinByKey()">
+            <label for="Join by key">Join by key</label>
+            <div class="row gap-10">
+                <input id="join-by-key" type="text" class="">
+                <button class="primary">Join</button>
+            </div>
 
-    //Handle overview page
-    const data = {
-        header: ["Name", "Death toll"],
-        rows: [
-            ["San-Francisco (1906)", 1500],
-            ["Messina (1908)", 87000],
-            ["Ashgabat (1948)", 175000],
-            ["Chile (1960)", 10000],
-            ["Tian Shan (1976)", 242000],
-            ["Armenia (1988)", 25000],
-            ["Iran (1990)", 50000]
-        ]
-    };
-    setupCategoryChart('.chart', data);
+            <div class="spacer-2></div>
+
+            <h3 class="popup-title">Create new household</h3>
+            <label for="name">Household name</label>
+            <input id="new-hh-name" type="text" class="">
+            <label for="address">Address</label>
+            <input id="new-hh-address" type="text" class="">
+            <button class="primary">Create</button>
+        </form>
+        `);
+    });
+    initChangePage(settingsBtn, getSettings, true);
 
     //Show overview by default
     overviewBtn.classList.add('active');
@@ -95,17 +104,22 @@ function getOverview(initializeFunctionality) {
     xhr.setStandardTimeout();
     xhr.setError();
     xhr.onload = function() {
+        logOffUnauthenticated(xhr);
         if((xhr.status === 200)){
-            if(initializeFunctionality) 
-            initOverviewFunctionality(xhr.response);
+            if(initializeFunctionality){
+                initOverviewFunctionality(xhr.response);
+                initExpense(JSON.parse(xhr.response).categories);
+                initHousehold();
+                initSettings();
+            }
             window.localStorage.setItem("userId", JSON.parse(xhr.response).user.uid);
-            showPage('#overview')
+            showPage('#overview');
         }
     };
     xhr.send();
 }
 
-function addHouseholdNavigationUI(household) {
+function initHouseholdNavigationUI(household) {
     //Page
     const pages = document.querySelector('#system-content');
 
@@ -117,24 +131,25 @@ function addHouseholdNavigationUI(household) {
 
     //Navigation
     const nav = document.querySelector('#navigation');
-    const settings = document.querySelector('#settings-link');
+    const addHousehold = document.querySelector('#add-household-link');
 
     const pHouseholdElement = document.createElement('p');
     pHouseholdElement.dataset.id = household.hhid;
     pHouseholdElement.innerHTML = '<span class="material-icons icn">home</span> ' + household.name;
-    initChangePage(pHouseholdElement, () => {}); //Click functionality
+    initChangePage(pHouseholdElement, () => { return getHousehold(household); }, true); //Click functionality
 
     const ulHouseholdElement = document.createElement('ul');
-    household.users.forEach((user) => {
+    household.users.forEach(user => {
+        if(user._id === household.self) return;
         const liHouseholdElement = document.createElement('li');
         const lastName = user.surname ? user.surname.charAt(0) : '';
         liHouseholdElement.innerHTML = '<span class="material-icons icn-mini">chevron_right</span>' + user.name + ' ' + lastName;
-        liHouseholdElement.dataset.id = user.uid;
+        liHouseholdElement.dataset.id = user._id;
         ulHouseholdElement.appendChild(liHouseholdElement);
     });
 
-    nav.insertBefore(pHouseholdElement, settings);
-    nav.insertBefore(ulHouseholdElement, settings);
+    nav.insertBefore(pHouseholdElement, addHousehold);
+    nav.insertBefore(ulHouseholdElement, addHousehold);
 }
 
 function getSettings() {
@@ -145,6 +160,7 @@ function getSettings() {
     xhr.setStandardTimeout();
     xhr.setError();
     xhr.onload = function() {
+        logOffUnauthenticated(xhr);
         if((xhr.status === 200)){
             updateSettingsUI(JSON.parse(xhr.response));
             showPage('#settings');
@@ -162,23 +178,7 @@ function updateSettingsUI(res) {
 
     document.querySelector('#pi-income').value = res.estimatedMonthlyIncome;
 
-    const newsletterCheckbox = document.querySelector('#pi-newsletter');
-
-    if(res.newsletter){
-        newsletterCheckbox.classList.add('active');
-        newsletterCheckbox.dataset.checked = 'true';
-    }
-
-    newsletterCheckbox.addEventListener('click', () => {
-        if(newsletterCheckbox.dataset.checked === 'true'){
-            newsletterCheckbox.classList.remove('active');
-            newsletterCheckbox.dataset.checked = 'false';
-        }
-        else {
-            newsletterCheckbox.classList.add('active');
-            newsletterCheckbox.dataset.checked = 'true';
-        }
-    });
+    document.querySelector('#pi-newsletter').setCheckbox(res.newsletter);
 
     const hhContainer = document.querySelector('#settings .hh-container');
     while(hhContainer.firstChild) hhContainer.removeChild(hhContainer.firstChild);
@@ -212,6 +212,14 @@ function updateSettingsUI(res) {
     }
 }
 
+function initSettings(){
+    document.querySelector('#pi-newsletter').initCheckbox();
+}
+
+function initHousehold(){
+    initPopups();
+}
+
 function updatePersonalInfo(){
     try {
         hideError('#error-msg');
@@ -228,7 +236,7 @@ function updatePersonalInfo(){
 
         const json = {
             "estimatedMonthlyIncome": document.querySelector('#pi-income').value,
-            "newsletter": (document.querySelector("#pi-newsletter").dataset.checked === 'true'),
+            "newsletter": document.querySelector("#pi-newsletter").getCheckbox(),
             "user": {
                 "name": document.querySelector("#pi-name").value,
                 "surname": document.querySelector("#pi-surname").value,
@@ -245,6 +253,7 @@ function updatePersonalInfo(){
         xhr.setStandardTimeout();
         xhr.setError();
         xhr.onload = function() {
+            logOffUnauthenticated(xhr);
             if(xhr.status === 200){
                 inform("Settings updated successfully", "success");
                 updateSettingsUI(JSON.parse(xhr.response));
@@ -285,6 +294,7 @@ function leaveHousehold(hhid, uid){
     xhr.setStandardTimeout();
     xhr.setError();
     xhr.onload = function() {
+        logOffUnauthenticated(xhr);
         if(xhr.status === 200){
             getOverview();
             getSettings();
@@ -297,4 +307,256 @@ function leaveHousehold(hhid, uid){
         }
     };
     xhr.send();
+}
+
+function sendInvite(){
+    try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `http://45.80.152.150/join/household/${hhid}/user/${uid}`, true);
+        xhr.allowJson();
+        xhr.addToken();
+        xhr.setStandardTimeout();
+        xhr.setError();
+        xhr.onload = function() {
+            logOffUnauthenticated(xhr);
+            if(xhr.status === 200){
+                getOverview();
+                getSettings();
+            }
+            else if (xhr.status === 430){
+                showError('#error-msg', xhr.response);
+            }
+            else {
+                inform(xhr.response, "failure");
+            }
+        };
+        xhr.send();
+    } catch(err) { }
+    return false;
+}
+
+function getHousehold(household){
+    showPage('#loading-page');
+    backupPage = '#household';
+
+    const hh = document.querySelector('#household');
+
+    //Setup Invite button
+    hh.querySelector('#hh-invite-user').addEventListener('click', () => {
+        hh.popup(`Invite new user to ${household.name}`, `
+        <form style="width: 400px" onsubmit="return sendInvite()">
+            <label for="Join key">Join key</label>
+            <h2 class="join-key-txt">${household.join_key}</h2>
+            <div class="spacer"></div>
+            
+            <label for"Email to invite">Email to invite</label>
+            <input id="hh-invite-email" type="email" class="">
+            <div class="spacer"></div>
+            <button class="primary">Send invite</button>
+        </form>
+        `);
+    });
+
+    //Setup new expense buttons
+    hh.querySelector('.new-exp-rec').addEventListener('click', () => fillNewExpense(household, true));
+    hh.querySelector('.new-exp').addEventListener('click', () => {
+        fillNewExpense(household, false);
+    });
+
+    //Setup name
+    hh.querySelector('.page-title').innerText = household.name;
+
+    showPage('#household');
+}
+
+function fillNewExpense(household, recurringByDefault){
+    showPage('#loading-page');
+
+    const exp = document.querySelector('#expense');
+
+    //PREFILL FORM
+
+    //Household data
+    if(household){
+        exp.querySelector('#exp-household').value = household.name;   
+        exp.querySelector('#exp-household').dataset.id = household.hhid;
+
+    } else {
+        exp.querySelector('#exp-household').value = 'None';   
+        exp.querySelector('#exp-household').dataset.id = null;
+    }
+
+    //Paid by and Payers
+    const paidBy = exp.querySelector('#exp-paid-by');
+    paidBy.initPickBox();
+
+    const payerBox = exp.querySelector('#exp-payers');
+    while(payerBox.firstChild) payerBox.removeChild(payerBox.firstChild);
+    
+    household.users.forEach(user => {
+        paidBy.addPick(user._id, `<p class="dye-active title">${user.name + ' ' + user.surname}</p>`);
+
+        if(user._id === household.self) paidBy.selectPick(user._id);
+        
+        const payer = document.createElement('div');
+        payer.dataset.id = user._id;
+        payer.dataset.checked = 'false';
+        payer.classList.add('payer');
+        payer.innerHTML = `
+            <span class="material-icons checkbox">checkbox</span>
+            <p class="name">${user.name + ' ' + user.surname}</p>
+            <div class="share-wrap percentage-input hidden">
+                <input type="number" class="share" max="100" min="0" step="0.1">
+            </div>
+        `;
+        const checkbox = payer.querySelector('.checkbox');
+        const shareWrap = payer.querySelector('.share-wrap');
+        checkbox.addEventListener('click', () => {
+            if(payer.dataset.checked === 'true'){
+                payer.dataset.checked = 'false';
+                checkbox.classList.remove('active');
+                shareWrap.classList.add('hidden');
+            } else {
+                payer.dataset.checked = 'true';
+                checkbox.classList.add('active');
+                shareWrap.classList.remove('hidden');
+            }
+        });
+
+        payerBox.appendChild(payer);
+    });
+
+    //Reset amount, category and frequency
+    exp.querySelector("#exp-amount").value = null;
+    exp.querySelector('#payer-split-division').selectPick('div-equally');
+    exp.querySelector('#exp-category').deselectPicks();
+    exp.querySelector('#exp-rec-frequency').deselectPicks();
+
+    //Recurring checkbox
+    exp.querySelector('#exp-is-recurring').setCheckbox(recurringByDefault);
+
+    //Start date
+    exp.querySelector('#exp-rec-start-date').valueAsDate = new Date();
+
+    //Don't show unnecessary elements
+    if(!household){
+        payerBox.classList.add('hidden');
+    } 
+
+    showPage('#expense');
+}
+
+function postExpense(){
+    try {
+        const exp = document.querySelector('#expense');
+
+        const household = exp.querySelector("#exp-household").dataset.id;
+        const householdQuery = household ? "?household=" + household : "";
+    
+        let cid = exp.querySelector("#exp-category").getSelectedPickId();
+        let frequency = exp.querySelector("#exp-rec-frequency").getSelectedPickId();
+        const amount = exp.querySelector("#exp-amount").value;
+        const payers = [];
+        if(household) {
+            exp.querySelectorAll("#exp-payers .payer[data-checked='true']").forEach(payer => {
+                payers.push({
+                    "uid": payer.dataset.id,
+                    "percentageToPay": payer.querySelector(".share").value
+                });
+            });
+        }
+        
+        let recurring = null;
+        if(exp.querySelector("#exp-is-recurring").getCheckbox()){
+            recurring = {
+                "startDate": exp.querySelector("#exp-rec-start-date").valueAsDate,
+                "endDate": exp.querySelector("#exp-rec-end-date").valueAsDate,
+                "frequency": frequency,
+                "reminder": exp.querySelector("#exp-send-reminder").getCheckbox()
+            };
+        }
+    
+        const json = {
+            "cid": cid,
+            "amount": amount,
+            "payers": payers,
+            "recurring": recurring
+        };
+    
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://45.80.152.150/expense' + householdQuery, true);
+        xhr.allowJson();
+        xhr.addToken();
+        xhr.setStandardTimeout();
+        xhr.setError();
+        xhr.onload = function() {
+            logOffUnauthenticated(xhr);
+            if((xhr.status === 200)){
+                inform("Expense added successfully", "success");
+                showPage(backupPage);
+            }
+            else {
+                inform(xhr.response, "failure");
+            }
+        };
+        xhr.send(JSON.stringify(json));
+    } catch(err) {
+        console.log(err);
+        return false;
+    }
+
+    return false;
+}
+
+function initExpense(categories) {
+    
+    const exp = document.querySelector('#expense');
+
+    //Recurring expense checkbox functionality
+    exp.querySelector('#exp-is-recurring').initCheckbox(
+        () => exp.querySelector('#exp-rec-form').classList.remove('hidden'),
+        () => exp.querySelector('#exp-rec-form').classList.add('hidden')
+    );
+
+    //Send email reminder checkbox functionality
+    exp.querySelector('#exp-send-reminder').initCheckbox();
+
+    //Setup split division
+    const divisionBox = exp.querySelector('#payer-split-division');
+    divisionBox.initPickBox();
+    const divisions = [
+        { id: 'div-equally', value:'Divide equally' },
+        { id: 'div-by-size', value:'Divide by room size' },
+        { id: 'div-individually', value:'Divide individually' }];
+    divisions.forEach(d => {
+        divisionBox.addPick(d.id, `<p class="title dye-active">${d.value}</p>`);
+    });
+
+    //Setup categories
+    const categoryBox = exp.querySelector('#exp-category');
+    categoryBox.initPickBox();
+
+    categories.forEach(c => {
+        categoryBox.addPick(c._id, `
+            <span class="material-icons dye-active">${c.icon}</span>
+            <p>${c.title}</p>
+        `);
+    })
+
+    //Setup frequencies
+    const frequencyBox = exp.querySelector('#exp-rec-frequency');
+    frequencyBox.initPickBox();
+
+    const frequencies = [
+        { id: 'day', value: 'Day' },
+        { id: 'week', value: 'Week' },
+        { id: '2-week', value: '2 Weeks' },
+        { id: 'month', value: 'Month' },
+        { id: '3-month', value: '3 Months' },
+        { id: '6-month', value: '6 Months' },
+        { id: 'year', value: 'Year' }
+    ];
+    frequencies.forEach(f => {
+        frequencyBox.addPick(f.id, `<p class="dye-active caps-title">${f.value}</p>`);
+    });
 }

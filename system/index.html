@@ -13,6 +13,8 @@
 
     <script src="/script/setup.js"></script>
     <script src="/script/alerts.js"></script>
+    <script src="/script/form-tools.js"></script>
+    <script src="/script/popup.js"></script>
     <script src="/script/loading.js"></script>
     <script src="/system/system.js"></script>
     <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
@@ -29,6 +31,7 @@
             <div id="navigation">
                 <p id="overview-link"><span class="material-icons icn">star</span> Overview</p>
                 <!-- <br> -->
+                <p id="add-household-link"><span class="material-icons icn">add_home</span> Add household</p>
                 <p id="settings-link"><span class="material-icons icn">settings</span> Settings</p>
             </div>
         </div>
@@ -36,7 +39,6 @@
     <div id="system-content">
         <div class="fade-scroll"></div>
         <div id="loading-page" class="page">
-            <p>Loading...</p>
             <div>
                 <div></div>
             </div>
@@ -46,13 +48,86 @@
             <h2 class="page-title">Overview</h2>
             <div id="chart"></div>
         </div>
-        <div id="household-template" class="page">
+        <div id="expense" class="page">
+            <div class="page-top-margin"></div>
+            <h2 class="page-title">Add new expense</h2>
+            <form onsubmit="return postExpense()" class="page-form">
+                <div class="page-field w-33">
+                    <label for="Household">Household</label>
+                    <input type="text" id="exp-household" disabled autocomplete="off">
+                </div>
+                <div class="page-field w-33">
+                    <label for="Amount">Amount</label>
+                    <input type="number" id="exp-amount" autocomplete="off">
+                </div>
+
+                <div class="page-field">
+                    <label for="Paid by">Paid by</label>
+                    <div id="exp-paid-by"></div>
+                </div>
+                
+                <div class="page-field">
+                    <label for="Payers">Payers</label>
+                    <div id="exp-payers"></div>
+                    <div class="spacer"></div>
+
+                    <div class="pick-wrap">
+                        <div id="payer-split-division"></div>
+                    </div>
+                </div>
+                
+                <div class="spacer"></div>
+
+                <div class="page-field">
+                    <label for="Category">Category</label>
+                    <div id="exp-category"></div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div id="exp-send-reminder">Send email reminder to users once new expense is due</div>
+                <div id="exp-is-recurring">Expense is recurring</div>
+
+                <div id="exp-rec-form" class="hidden">
+                    <h3 class="page-subtitle">Recurring expense settings</h3>
+                    <!-- <div class="spacer"></div> -->
+                    <div class="row">
+                        <div class="page-field w-33">
+                            <label for="Start date">From</label>
+                            <input type="date" id="exp-rec-start-date" autocomplete="off">
+                        </div>
+                        <div class="page-field w-33">
+                            <label for="End date">To</label>
+                            <input type="date" id="exp-rec-end-date" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="spacer"></div>
+
+                    <div class="page-field">
+                        <label for="Frequency">Frequency (Repeat every)</label>
+                        <div id="exp-rec-frequency">
+                            <!-- <p class="frequency" data-id="day">Day</p> -->
+                            <p class="frequency" data-id="week">Week</p>
+                            <p class="frequency" data-id="2-week">2 Weeks</p>
+                            <p class="frequency" data-id="month">Month</p>
+                            <p class="frequency" data-id="3-month">3 Months</p>
+                            <p class="frequency" data-id="6-month">6 Months</p>
+                            <p class="frequency" data-id="year">Year</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="spacer-2"></div>
+                <button class="primary submit-expense">Submit expense</button>
+                <div class="spacer"></div>
+            </form>
+        </div>
+        <div id="household" class="page">
             <div class="page-top-margin"></div>
             <div class="row spaced-out">
                 <h2 class="page-title">Household name</h2>
                 <div class="row gap-15">
                     <button class="page-top-btn primary small"><span class="material-icons icn">show_chart</span> Settle</button>
-                    <button class="page-top-btn secondary small"><span class="material-icons icn">person_add</span> Invite</button>
+                    <button id="hh-invite-user" class="page-top-btn secondary small"><span class="material-icons icn">person_add</span> Invite</button>
                     <button class="page-top-btn secondary small">More <span class="material-icons icn">arrow_drop_down</span></button>
                     <!-- <button class="page-top-btn secondary small"><span class="material-icons icn">logout</span> Leave</button>
                     <button class="page-top-btn secondary small"><span class="material-icons icn">delete_forever</span> Delete</button> -->
@@ -90,7 +165,7 @@
             <div class="spacer-2"></div>
             <div class="row spaced-out align-end">
                 <h3 class="page-subtitle no-margin">Recurring expenses</h3>
-                <button class="secondary small"><span class="material-icons icn">add</span> New</button>
+                <button class="secondary small new-exp-rec"><span class="material-icons icn">add</span> New</button>
             </div>
             <div class="spacer-small"></div>
             <ul id="recurring" class="expenses">
@@ -111,7 +186,7 @@
             <div class="spacer-2"></div>
             <div class="row spaced-out align-end">
                 <h3 class="page-subtitle no-margin">Expenses</h3>
-                <button class="secondary small"><span class="material-icons icn">add</span> New</button>
+                <button class="secondary small new-exp"><span class="material-icons icn">add</span> New</button>
             </div>
             <div class="spacer-small"></div>
             <ul id="expenses" class="expenses">
@@ -138,7 +213,7 @@
             <div class="spacer"></div>
 
             <form onsubmit="return updatePersonalInfo()" id="settings-form" class="page-form">
-                <div class="page-field w-50">
+                <div class="page-field w-33">
                     <label for="Email">Email</label>
                     <input type="text" id="pi-email" disabled autocomplete="off">
                 </div>
@@ -162,10 +237,7 @@
 
                 <div class="spacer"></div>
 
-                <div class="row">
-                    <span class="material-icons checkbox" id="pi-newsletter">checkbox</span>
-                    <p class="checkbox-label">Receive our email newsletter with tips on saving, managing a household with your roommates and more!</p>
-                </div>
+                <div id="pi-newsletter">Receive our email newsletter with tips on saving, managing a household with your roommates and more!</div>
                 
                 <div class="spacer"></div>
 

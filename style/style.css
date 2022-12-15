@@ -7,12 +7,13 @@
     --secondary-red: #ffa1a1;
     --secondary-light-red: #ffd6d6;
     --primary-black: #131313;
-    --primary-gray: #a8a8a8;
+    --primary-gray: #7c7c7c77;
     --primary-dark-gray: #797979;
     --primary-medium-gray: #dddddd;
     --primary-light-gray: #f7f7f7;
     --primary-white: #ffffff;
     --primary-transparent-white: #ffffff40;
+    --primary-heavy-transparent-white: #ffffff75;
 
     --failure-background: #f37272;
     --failure-foreground: #701a1a;
@@ -222,7 +223,7 @@ form, .page-form {
     color: var(--primary-white);
 }
 
-.checkbox.active {
+.checkbox-align.active > .checkbox, .checkbox.active {
     background-color: var(--primary-red);
     color: var(--primary-white);
     border: solid 2px var(--primary-red);
@@ -235,11 +236,15 @@ form, .page-form {
     font-weight: bold;
 }
 
+.checkbox-align {
+    align-items: center;
+}
+
 form label, .page-form label {
     text-transform: uppercase;
     font-size: 12px;
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 15px;
     margin-bottom: 5px;
 }
 
@@ -463,6 +468,7 @@ button.small, a.small {
     font-size: 12px;
     border-radius: 10px;
     height: fit-content;
+    width: fit-content;
 }
 
 button.primary.small {
@@ -671,4 +677,148 @@ p.note {
 .chart {
     width: 100%;
     min-height: 200px;
+}
+
+/* PICK */
+
+.pick-wrap {
+    width: 100%;
+    overflow-x: scroll;
+}
+
+.pick-wrap::-webkit-scrollbar {
+    display: none;
+}
+
+.pick-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+
+    height: auto;
+    width: fit-content;
+}
+
+/* .pick-box:last-child() {
+    margin-right: 5px;
+} */
+
+.pick-box > .pick {
+    height: auto;
+    min-height: 20px;
+    width: auto;
+    min-width: 80px;
+
+    margin-bottom: 5px;
+
+    box-shadow: 3px 3px var(--primary-gray);
+    border: solid 2px var(--primary-black);
+    border-radius: 10px;
+    background-color: var(--primary-white);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+
+    user-select: none;
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 300;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.pick-box > .pick:hover {
+    background-color: var(--primary-light-gray);
+}
+
+.pick-box > .pick:active, .pick-box > .pick.active:active {
+    box-shadow: none;
+    margin: 3px -3px 2px 3px;
+}
+
+.pick-box > .pick.active {
+    box-shadow: 3px 3px var(--primary-red);
+    border: solid 2px var(--primary-red);
+    background-color: var(--primary-white);
+}
+
+.pick-box > .pick span.material-icons.head-icon {
+    font-size: 30px !important;
+}
+
+.pick-box > .pick .caps-title {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.pick-box > .pick .title {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.pick-box > .pick.active .dye-active {
+    color: var(--primary-red);
+}
+
+/* POPUP */
+
+div#popup-wrap.page {
+    position: absolute !important;
+    top: 0px;
+
+    z-index: 3;
+
+    width: 100%;
+    height: 100vh;
+    margin-left: -165px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: stretch;
+    align-self: stretch;
+
+    background-color: var(--primary-heavy-transparent-white);
+}
+
+#popup {
+    box-shadow: 3px 3px var(--primary-gray);
+    border: solid 2px var(--primary-black);
+    border-radius: 15px;
+    background-color: var(--primary-white);
+
+    min-height: 100px;
+    height: auto;
+    max-height: 95vh;
+
+    min-width: 200px;
+    width: auto;
+    max-width: 95%;
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 10px;
+}
+
+.popup-title {
+    margin-right: 30px;
+    margin-bottom: 5px;
+}
+
+.x-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    cursor: pointer;
+    user-select: none;
 }

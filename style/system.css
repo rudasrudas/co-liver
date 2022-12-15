@@ -4,6 +4,7 @@
     justify-content: stretch;
     gap: 15px;
     height: 100vh;
+    position: relative;
 }
 
 #system::-webkit-scrollbar {
@@ -17,6 +18,7 @@
     display: flex;
     flex-direction: column;
     flex: 0 1 auto;
+    z-index: 2;
     position: fixed;
 }
 
@@ -156,14 +158,19 @@
     height: auto;
     min-height: 100px;
     margin-top: 15px;
-    margin-left: 165px;
+    padding-left: 165px;
     width: 100%;
-    /* background-color: var(--primary-light-gray); */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
 }
 
 #system-content > .page {
     height: auto;
     display: none;
+    position: relative;
 } 
 
 #system-content > .page.active {
@@ -237,6 +244,10 @@
 
 .page-form .w-50 {
     width: 50%;
+}
+
+.page-form .w-66 {
+    width: 66%;
 }
 
 .page-form .w-25 {
@@ -350,4 +361,49 @@
     font-size: 20px !important;
     user-select: none;
     cursor: pointer;
+}
+
+#exp-payers {
+    display: flex;
+    flex-direction: column;
+}
+
+#exp-payers .payer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 1px;
+    align-items: center;
+    height: 30px;
+    min-width: 300px;
+    padding: 5px 0px;
+    font-size: 14px;
+}
+
+#exp-payers .payer .share {
+    justify-self: flex-end;
+    width: 40px;
+    margin-left: 10px;
+    border: none;
+    background-color: var(--primary-medium-gray) !important;
+    text-align: right;
+}
+
+.percentage-input {
+    display: flex;
+    align-items: center;
+}
+
+.percentage-input::after {
+    content: '%';
+    margin-left: 3px;
+    font-size: 20px;
+}
+
+/* No arrows in number input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
