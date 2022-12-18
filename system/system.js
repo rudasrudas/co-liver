@@ -77,14 +77,20 @@ function initOverviewFunctionality(res){
                 <input id="join-by-key" type="text" class="">
                 <button class="primary">Join</button>
             </div>
-
-            <div class="spacer-2></div>
-
+        </form>
+        <form style="width: 400px" onsubmit="return joinByInvitation()">
+            <div class="spacer-2"></div>
             <h3 class="popup-title">Create new household</h3>
-            <label for="name">Household name</label>
-            <input id="new-hh-name" type="text" class="">
-            <label for="address">Address</label>
-            <input id="new-hh-address" type="text" class="">
+            <div class="page-field w-66">
+                <label for="name">Household name</label>
+                <input id="new-hh-name" type="text" class="">
+            </div>
+            <div class="page-field">
+                <label for="address">Address</label>
+                <input id="new-hh-address" type="text">
+            </div>
+            <div class="spacer-small"></div>
+            
             <button class="primary">Create</button>
         </form>
         `);
@@ -94,6 +100,58 @@ function initOverviewFunctionality(res){
     //Show overview by default
     overviewBtn.classList.add('active');
     document.querySelector('#overview').classList.add('active');
+}
+
+function joinByKey(){
+    const key = document.querySelector("#join-by-key").value;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `http://45.80.152.150/join/household?key=${key}`, true);
+    xhr.allowJson();
+    xhr.addToken();
+    xhr.setStandardTimeout();
+    xhr.setError();
+    xhr.onload = function() {
+        logOffUnauthenticated(xhr);
+        if((xhr.status === 200)){
+            console.log(JSON.parse(xhr.response));
+            initHouseholdNavigationUI(xhr.response);
+            showPage(`.page[data-id='${xhr.response._id}']`);
+        }
+    };
+    xhr.send(JSON.stringify(json));
+
+    hidePopup();
+    return false;
+}
+
+function joinByInvitation(){
+    const name = document.querySelector("#new-hh-name").value;
+    const address = document.querySelector("#new-hh-address").value;
+    const json = {
+        "name": name,
+        "address": address,
+        'currency': 'DKK'
+    };
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://45.80.152.150/household/', true);
+    xhr.allowJson();
+    xhr.addToken();
+    xhr.setStandardTimeout();
+    xhr.setError();
+    xhr.onload = function() {
+        logOffUnauthenticated(xhr);
+        if((xhr.status === 200)){
+            console.log(JSON.parse(xhr.response));
+            initHouseholdNavigationUI(xhr.response);
+            showPage(`.page[data-id='${xhr.response._id}']`);
+        }
+    };
+    xhr.send(JSON.stringify(json));
+
+    hidePopup();
+    return false;
 }
 
 function getOverview(initializeFunctionality) {
@@ -120,14 +178,14 @@ function getOverview(initializeFunctionality) {
 }
 
 function initHouseholdNavigationUI(household) {
-    //Page
-    const pages = document.querySelector('#system-content');
+    // //Page
+    // const pages = document.querySelector('#system-content');
 
-    const divHouseholdPage = document.createElement('div');
-    divHouseholdPage.classList.add('page');
-    divHouseholdPage.dataset.id = household.hhid;
-    divHouseholdPage.innerHTML = `<h2 class="page-title">${household.name}</h2>`;
-    pages.appendChild(divHouseholdPage);
+    // const divHouseholdPage = document.createElement('div');
+    // divHouseholdPage.classList.add('page');
+    // divHouseholdPage.dataset.id = household.hhid;
+    // divHouseholdPage.innerHTML = `<h2 class="page-title">${household.name}</h2>`;
+    // pages.appendChild(divHouseholdPage);
 
     //Navigation
     const nav = document.querySelector('#navigation');
@@ -139,14 +197,16 @@ function initHouseholdNavigationUI(household) {
     initChangePage(pHouseholdElement, () => { return getHousehold(household); }, true); //Click functionality
 
     const ulHouseholdElement = document.createElement('ul');
-    household.users.forEach(user => {
-        if(user._id === household.self) return;
-        const liHouseholdElement = document.createElement('li');
-        const lastName = user.surname ? user.surname.charAt(0) : '';
-        liHouseholdElement.innerHTML = '<span class="material-icons icn-mini">chevron_right</span>' + user.name + ' ' + lastName;
-        liHouseholdElement.dataset.id = user._id;
-        ulHouseholdElement.appendChild(liHouseholdElement);
-    });
+    if(household.users){
+        household.users.forEach(user => {
+            if(user._id === household.self) return;
+            const liHouseholdElement = document.createElement('li');
+            const lastName = user.surname ? user.surname.charAt(0) : '';
+            liHouseholdElement.innerHTML = '<span class="material-icons icn-mini">chevron_right</span>' + user.name + ' ' + lastName;
+            liHouseholdElement.dataset.id = user._id;
+            ulHouseholdElement.appendChild(liHouseholdElement);
+        });
+    }
 
     nav.insertBefore(pHouseholdElement, addHousehold);
     nav.insertBefore(ulHouseholdElement, addHousehold);
@@ -296,6 +356,7 @@ function leaveHousehold(hhid, uid){
     xhr.onload = function() {
         logOffUnauthenticated(xhr);
         if(xhr.status === 200){
+            inform("Successfully left the household!", "success");
             getOverview();
             getSettings();
         }
@@ -303,16 +364,40 @@ function leaveHousehold(hhid, uid){
             showError('#error-msg', xhr.response);
         }
         else {
-            inform(xhr.response, "failure");
+            inform("Failed to leave the household. Server responded with status code " + xhr.status, "failure");
         }
     };
     xhr.send();
+    hidePopup();
 }
 
-function sendInvite(){
+function deleteHousehold(hhid){
+    const xhr = new XMLHttpRequest();
+    xhr.open('DELETE', `http://45.80.152.150/household/${hhid}`, true);
+    xhr.allowJson();
+    xhr.addToken();
+    xhr.setStandardTimeout();
+    xhr.setError();
+    xhr.onload = function() {
+        logOffUnauthenticated(xhr);
+        if(xhr.status === 200){
+            inform("Successfully deleted the household!", "success");
+            getOverview();
+            getSettings();
+        }
+        else {
+            inform(`Failed to delete the household (${xhr.response}). Server responded with status code ${xhr.status}`, "failure");
+        }
+    };
+    xhr.send();
+    hidePopup();
+}
+
+function sendInvite(hhid){
+    const emailToInvite = document.querySelector("#hh-invite-email").value;
     try {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `http://45.80.152.150/join/household/${hhid}/user/${uid}`, true);
+        xhr.open('POST', `http://45.80.152.150/invite/household/${hhid}/user/${emailToInvite}?email=true`, true);
         xhr.allowJson();
         xhr.addToken();
         xhr.setStandardTimeout();
@@ -320,11 +405,7 @@ function sendInvite(){
         xhr.onload = function() {
             logOffUnauthenticated(xhr);
             if(xhr.status === 200){
-                getOverview();
-                getSettings();
-            }
-            else if (xhr.status === 430){
-                showError('#error-msg', xhr.response);
+                inform(`${emailToInvite} has been invited to join this household!\nAsk them to check their email to accept the invitation`, "success");
             }
             else {
                 inform(xhr.response, "failure");
@@ -332,28 +413,55 @@ function sendInvite(){
         };
         xhr.send();
     } catch(err) { }
+    hidePopup();
     return false;
+
 }
 
 function getHousehold(household){
     showPage('#loading-page');
     backupPage = '#household';
 
+    console.log(household);
+
     const hh = document.querySelector('#household');
 
-    //Setup Invite button
+    //Setup top row buttons
     hh.querySelector('#hh-invite-user').addEventListener('click', () => {
-        hh.popup(`Invite new user to ${household.name}`, `
-        <form style="width: 400px" onsubmit="return sendInvite()">
+        hh.popup(`Invite new user to "${household.name}"`, `
+        <form style="width: 400px" onsubmit="return sendInvite('${household.hhid}')">
             <label for="Join key">Join key</label>
-            <h2 class="join-key-txt">${household.join_key}</h2>
+            <h2 class="join-key-txt">${household.key}</h2>
+            <p style="font-size: 12px">Send this join key to your roommates so they can join this household too!</p>
             <div class="spacer"></div>
-            
+           
             <label for"Email to invite">Email to invite</label>
-            <input id="hh-invite-email" type="email" class="">
-            <div class="spacer"></div>
-            <button class="primary">Send invite</button>
+            <div class="row gap-10">
+                <input id="hh-invite-email" type="email" class="">
+                <button class="primary">Send invite</button>
+            </div>
         </form>
+        `);
+    });
+
+    hh.querySelector('#hh-leave-household').addEventListener('click', () => {
+        hh.popup(`Leave "${household.name}" household`, `
+        <p>Are you sure you want to leave this household permanently?<br>
+        Any balance will be lost forever.</p>
+        <div class="spacer"></div>    
+        <button class="primary at-the-end" onclick="leaveHousehold('${household.hhid}', '${window.localStorage.getItem('userId')}')">Leave</button>
+        `);
+    });
+
+    hh.querySelector('#hh-delete-household').addEventListener('click', () => {
+        hh.popup(`Delete "${household.name}" household`, `
+        <p>Are you sure you want to delete this household permanently?<br>
+        Any data and user balances will be lost forever!</p>
+        <div class="spacer"></div>    
+        <button class="primary at-the-end" onclick="deleteHousehold('${household.hhid}')">
+            <span class="material-icons icn-18">delete_forever</span>
+            Delete
+        </button>
         `);
     });
 

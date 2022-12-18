@@ -173,6 +173,11 @@
     position: relative;
 } 
 
+#join-by-key, #hh-invite-email {
+    display: flex;
+    flex-grow: 1;
+}
+
 #system-content > .page.active {
     display: block;
 }
@@ -214,7 +219,7 @@
     flex-wrap: wrap; */
 }
 
-.page-form .page-field {
+.page-field {
     display: flex;
     flex-direction: column;
     padding-right: 15px;
@@ -238,19 +243,23 @@
     align-items: flex-end;
 }
 
-.page-form .w-33 {
+.at-the-end {
+    align-self: flex-end;
+}
+
+form .w-33 {
     width: 33%;
 }
 
-.page-form .w-50 {
+form .w-50 {
     width: 50%;
 }
 
-.page-form .w-66 {
+form .w-66 {
     width: 66%;
 }
 
-.page-form .w-25 {
+form .w-25 {
     width: 25%;
 }
 
