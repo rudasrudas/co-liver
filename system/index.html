@@ -60,6 +60,10 @@
                     <label for="Amount">Amount</label>
                     <input type="number" id="exp-amount" autocomplete="off">
                 </div>
+                <div class="page-field w-33">
+                    <label for="Name">Name</label>
+                    <input type="text" id="exp-name" autocomplete="off">
+                </div>
 
                 <div class="page-field">
                     <label for="Paid by">Paid by</label>
@@ -90,7 +94,6 @@
 
                 <div id="exp-rec-form" class="hidden">
                     <h3 class="page-subtitle">Recurring expense settings</h3>
-                    <!-- <div class="spacer"></div> -->
                     <div class="row">
                         <div class="page-field w-33">
                             <label for="Start date">From</label>
@@ -105,15 +108,7 @@
 
                     <div class="page-field">
                         <label for="Frequency">Frequency (Repeat every)</label>
-                        <div id="exp-rec-frequency">
-                            <!-- <p class="frequency" data-id="day">Day</p> -->
-                            <p class="frequency" data-id="week">Week</p>
-                            <p class="frequency" data-id="2-week">2 Weeks</p>
-                            <p class="frequency" data-id="month">Month</p>
-                            <p class="frequency" data-id="3-month">3 Months</p>
-                            <p class="frequency" data-id="6-month">6 Months</p>
-                            <p class="frequency" data-id="year">Year</p>
-                        </div>
+                        <div id="exp-rec-frequency"></div>
                     </div>
                 </div>
                 <div class="spacer-2"></div>
@@ -124,7 +119,10 @@
         <div id="household" class="page">
             <div class="page-top-margin"></div>
             <div class="row spaced-out">
-                <h2 class="page-title">Household name</h2>
+                <div>
+                    <h2 class="page-title">Household name</h2>
+                    <p class="page-title-2">Household address</p>
+                </div>
                 <div class="row gap-15">
                     <button class="page-top-btn primary small"><span class="material-icons icn">show_chart</span> Settle</button>
                     <button id="hh-invite-user" class="page-top-btn secondary small"><span class="material-icons icn">person_add</span> Invite</button>
@@ -183,7 +181,7 @@
                 <div class="spacer-2"></div>
 
                 <div class="page-field w-50">
-                    <label for="Income">Estimated monthly income</label>
+                    <label for="Income" id="pi-income-label">Estimated monthly income</label>
                     <input type="number" id="pi-income" autocomplete="off">
                 </div>
 

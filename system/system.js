@@ -78,7 +78,7 @@ function initOverviewFunctionality(res){
                 <button class="primary">Join</button>
             </div>
         </form>
-        <form style="width: 400px" onsubmit="return joinByInvitation()">
+        <form style="width: 400px" onsubmit="return createHousehold()">
             <div class="spacer-2"></div>
             <h3 class="popup-title">Create new household</h3>
             <div class="page-field w-66">
@@ -132,7 +132,7 @@ function joinByKey(){
     return false;
 }
 
-function joinByInvitation(){
+function createHousehold(){
     const name = document.querySelector("#new-hh-name").value;
     const address = document.querySelector("#new-hh-address").value;
     const json = {
@@ -149,10 +149,10 @@ function joinByInvitation(){
     xhr.setError();
     xhr.onload = function() {
         logOffUnauthenticated(xhr);
-        if((xhr.status === 200)){
-            console.log(JSON.parse(xhr.response));
-            initHouseholdNavigationUI(xhr.response);
-            showPage(`.page[data-id='${xhr.response._id}']`);
+        if(xhr.status === 200){
+            inform("Successfully created the household!", "success");
+        } else {
+            inform(`Failed to create household (${xhr.response}). Server responded with status code ${xhr.status}`, "failure");
         }
     };
     xhr.send(JSON.stringify(json));
@@ -185,14 +185,6 @@ function getOverview(initializeFunctionality) {
 }
 
 function initHouseholdNavigationUI(household) {
-    // //Page
-    // const pages = document.querySelector('#system-content');
-
-    // const divHouseholdPage = document.createElement('div');
-    // divHouseholdPage.classList.add('page');
-    // divHouseholdPage.dataset.id = household.hhid;
-    // divHouseholdPage.innerHTML = `<h2 class="page-title">${household.name}</h2>`;
-    // pages.appendChild(divHouseholdPage);
 
     //Navigation
     const nav = document.querySelector('#navigation');
@@ -208,7 +200,7 @@ function initHouseholdNavigationUI(household) {
         household.users.forEach(user => {
             if(user._id === household.self) return;
             const liHouseholdElement = document.createElement('li');
-            const lastName = user.surname ? user.surname.charAt(0) : '';
+            const lastName = ''; //user.surname ? user.surname.charAt(0) : '';
             liHouseholdElement.innerHTML = '<span class="material-icons icn-mini">chevron_right</span>' + user.name + ' ' + lastName;
             liHouseholdElement.dataset.id = user._id;
             ulHouseholdElement.appendChild(liHouseholdElement);
@@ -220,6 +212,8 @@ function initHouseholdNavigationUI(household) {
 }
 
 function getSettings() {
+    showPage('#loading-page');
+
     const xhr = new XMLHttpRequest();
     xhr.open('GET', 'http://45.80.152.150/personal-info', true);
     xhr.allowJson();
@@ -231,6 +225,8 @@ function getSettings() {
         if((xhr.status === 200)){
             updateSettingsUI(JSON.parse(xhr.response));
             showPage('#settings');
+        } else {
+            inform(`Failed to get settings (${xhr.response})`, "failure");
         }
     };
     xhr.send();
@@ -254,6 +250,7 @@ function updateSettingsUI(res) {
         hhBlock.innerHTML = `
             <h4 class="hh-name">${hh.name}</h4>
             <p class="hh-id">ID: ${hh.hhid}</p>
+            <p class="hh-joined">Joined ${timeAgo(hh.joined)}</p>
             <label for="Room size">Room size, m²</label>
             <input type="number" class="hh-room-size" value="${hh.roomSize}">
             <span class="material-icons hh-leave">remove_circle</span>
@@ -471,22 +468,27 @@ function getHousehold(hhid){
                     `);
                 });
 
-                hh.querySelector('#hh-delete-household').addEventListener('click', () => {
-                    hh.popup(`Delete "${household.name}" household`, `
-                    <p>Are you sure you want to delete this household permanently?<br>
-                    Any data and user balances will be lost forever!</p>
-                    <div class="spacer"></div>    
-                    <button class="primary at-the-end" onclick="deleteHousehold('${household.hhid}')">
-                        <span class="material-icons icn-18">delete_forever</span>
-                        Delete
-                    </button>
-                    `);
-                });
+                if(household.isAdmin){
+                    hh.querySelector('#hh-delete-household').addEventListener('click', () => {
+                        hh.popup(`Delete "${household.name}" household`, `
+                        <p>Are you sure you want to delete this household permanently?<br>
+                        Any data and user balances will be lost forever!</p>
+                        <div class="spacer"></div>    
+                        <button class="primary at-the-end" onclick="deleteHousehold('${household.hhid}')">
+                            <span class="material-icons icn-18">delete_forever</span>
+                            Delete
+                        </button>
+                        `);
+                    });
+                } else {
+                    hh.querySelector('#hh-delete-household').classList.add('hidden');
+                }
 
                 // Setup interface
                 hh.querySelector('.new-exp-rec').addEventListener('click', () => fillNewExpense(household, true));
                 hh.querySelector('.new-exp').addEventListener('click', () => fillNewExpense(household, false));
                 hh.querySelector('.page-title').innerText = household.name;
+                hh.querySelector('.page-title-2').innerText = household.address;
 
                 // Load users
                 const userBox = document.querySelector('#hh-users');
@@ -529,7 +531,7 @@ function getHousehold(hhid){
                         eElement.innerHTML = `
                             <div class="row gap-10">
                                 <span class="material-icons expense-icon">${e.icon}</span>
-                                <p class="title">${e.category}</p>
+                                <p class="title">${e.name}</p>
                             </div>
                             <p class="payer">${e.paidBy}</p>
                             <p class="payers">${e.payers} people</p>
@@ -561,7 +563,7 @@ function getHousehold(hhid){
                         eElement.innerHTML = `
                             <div class="row gap-10">
                                 <span class="material-icons expense-icon">${e.icon}</span>
-                                <p class="title">${e.category}</p>
+                                <p class="title">${e.name}</p>
                             </div>
                             <p class="payer">${e.paidBy}</p>
                             <p class="payers">${e.payers} people</p>
@@ -619,7 +621,7 @@ function fillNewExpense(household, recurringByDefault){
         if(user._id === household.self) paidBy.selectPick(user._id);
         
         const payer = document.createElement('div');
-        payer.dataset.id = user._id;
+        payer.dataset.id = user.uid;
         payer.dataset.checked = 'false';
         payer.classList.add('payer');
         payer.innerHTML = `
@@ -648,6 +650,7 @@ function fillNewExpense(household, recurringByDefault){
 
     //Reset amount, category and frequency
     exp.querySelector("#exp-amount").value = null;
+    exp.querySelector("#exp-name").value = null;
     exp.querySelector('#payer-split-division').selectPick('div-equally');
     exp.querySelector('#exp-category').deselectPicks();
     exp.querySelector('#exp-rec-frequency').deselectPicks();
@@ -676,6 +679,7 @@ function postExpense(){
         let cid = exp.querySelector("#exp-category").getSelectedPickId();
         let frequency = exp.querySelector("#exp-rec-frequency").getSelectedPickId();
         const amount = exp.querySelector("#exp-amount").value;
+        const name = exp.querySelector("#exp-name").value;
         const payers = [];
         if(household) {
             exp.querySelectorAll("#exp-payers .payer[data-checked='true']").forEach(payer => {
@@ -699,6 +703,7 @@ function postExpense(){
         const json = {
             "cid": cid,
             "amount": amount,
+            "name": name,
             "payers": payers,
             "recurring": recurring
         };
@@ -713,7 +718,7 @@ function postExpense(){
             logOffUnauthenticated(xhr);
             if((xhr.status === 200)){
                 inform("Expense added successfully", "success");
-                showPage(backupPage);
+                getHousehold(household);
             }
             else {
                 inform(xhr.response, "failure");

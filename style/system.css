@@ -296,7 +296,13 @@ form .w-25 {
     text-transform: uppercase;
     font-style: italic;
     font-size: 12px;
-    margin: 5px 0px;
+    margin: 5px 0px 0px 0px;
+}
+
+.hh-block .hh-joined {
+    color: var(--primary-gray);
+    font-style: italic;
+    font-size: 12px;
 }
 
 .hh-block .hh-leave {
