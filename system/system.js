@@ -74,7 +74,7 @@ function initOverviewFunctionality(res){
         <form style="width: 400px" onsubmit="return joinByKey()">
             <label for="Join by key">Join by key</label>
             <div class="row gap-10">
-                <input id="join-by-key" type="text" class="">
+                <input id="join-by-key" type="text" class="" required>
                 <button class="primary">Join</button>
             </div>
         </form>
@@ -83,11 +83,11 @@ function initOverviewFunctionality(res){
             <h3 class="popup-title">Create new household</h3>
             <div class="page-field w-66">
                 <label for="name">Household name</label>
-                <input id="new-hh-name" type="text" class="">
+                <input id="new-hh-name" type="text" class="" required>
             </div>
             <div class="page-field">
                 <label for="address">Address</label>
-                <input id="new-hh-address" type="text">
+                <input id="new-hh-address" type="text" required>
             </div>
             <div class="spacer-small"></div>
             
@@ -103,24 +103,31 @@ function initOverviewFunctionality(res){
 }
 
 function joinByKey(){
-    const key = document.querySelector("#join-by-key").value;
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `http://45.80.152.150/join/household?key=${key}`, true);
-    xhr.allowJson();
-    xhr.addToken();
-    xhr.setStandardTimeout();
-    xhr.setError();
-    xhr.onload = function() {
-        logOffUnauthenticated(xhr);
-        if((xhr.status === 200)){
-            console.log(JSON.parse(xhr.response));
-            initHouseholdNavigationUI(xhr.response);
-            showPage(`.page[data-id='${xhr.response._id}']`);
-        }
-    };
-    xhr.send(JSON.stringify(json));
-
+    try {
+        const key = document.querySelector("#join-by-key").value;
+    
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `http://45.80.152.150/join/household?key=${key}`, true);
+        xhr.allowJson();
+        xhr.addToken();
+        xhr.setStandardTimeout();
+        xhr.setError();
+        xhr.onload = function() {
+            logOffUnauthenticated(xhr);
+            if(xhr.status === 200){
+                inform("Successfully joined the household!", "success");
+                // location.reload();
+            } else if (xhr.status === 530) {
+                inform(xhr.response, "info");
+            } else {
+                inform(`Failed to join household (${xhr.response}). Server responded with status code ${xhr.status}`, "failure");
+            }
+        };
+        xhr.send();
+    
+    } catch(err) {
+        console.log(err);
+    }
     hidePopup();
     return false;
 }
@@ -194,7 +201,7 @@ function initHouseholdNavigationUI(household) {
     const pHouseholdElement = document.createElement('p');
     pHouseholdElement.dataset.id = household.hhid;
     pHouseholdElement.innerHTML = '<span class="material-icons icn">home</span> ' + household.name;
-    initChangePage(pHouseholdElement, () => { return getHousehold(household); }, true); //Click functionality
+    initChangePage(pHouseholdElement, () => { return getHousehold(household.hhid); }, true); //Click functionality
 
     const ulHouseholdElement = document.createElement('ul');
     if(household.users){
@@ -418,63 +425,168 @@ function sendInvite(hhid){
 
 }
 
-function getHousehold(household){
+function getHousehold(hhid){
     showPage('#loading-page');
     backupPage = '#household';
 
-    console.log(household);
-
     const hh = document.querySelector('#household');
 
-    //Setup top row buttons
-    hh.querySelector('#hh-invite-user').addEventListener('click', () => {
-        hh.popup(`Invite new user to "${household.name}"`, `
-        <form style="width: 400px" onsubmit="return sendInvite('${household.hhid}')">
-            <label for="Join key">Join key</label>
-            <h2 class="join-key-txt">${household.key}</h2>
-            <p style="font-size: 12px">Send this join key to your roommates so they can join this household too!</p>
-            <div class="spacer"></div>
-           
-            <label for"Email to invite">Email to invite</label>
-            <div class="row gap-10">
-                <input id="hh-invite-email" type="email" class="">
-                <button class="primary">Send invite</button>
-            </div>
-        </form>
-        `);
-    });
+    try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `http://45.80.152.150/household/${hhid}`, true);
+        xhr.allowJson();
+        xhr.addToken();
+        xhr.setStandardTimeout();
+        xhr.setError();
+        xhr.onload = function() {
+            logOffUnauthenticated(xhr);
+            if(xhr.status === 200){
+                const household = JSON.parse(xhr.response);
+                console.log(household);
 
-    hh.querySelector('#hh-leave-household').addEventListener('click', () => {
-        hh.popup(`Leave "${household.name}" household`, `
-        <p>Are you sure you want to leave this household permanently?<br>
-        Any balance will be lost forever.</p>
-        <div class="spacer"></div>    
-        <button class="primary at-the-end" onclick="leaveHousehold('${household.hhid}', '${window.localStorage.getItem('userId')}')">Leave</button>
-        `);
-    });
+                // Setup top row buttons
+                hh.querySelector('#hh-invite-user').addEventListener('click', () => {
+                    hh.popup(`Invite new user to "${household.name}"`, `
+                    <form style="width: 400px" onsubmit="return sendInvite('${household.hhid}')">
+                        <label for="Join key">Join key</label>
+                        <h2 class="join-key-txt">${household.key}</h2>
+                        <p style="font-size: 12px">Send this join key to your roommates so they can join this household too!</p>
+                        <div class="spacer"></div>
+                    
+                        <label for"Email to invite">Email to invite</label>
+                        <div class="row gap-10">
+                            <input id="hh-invite-email" type="email" class="" required>
+                            <button class="primary">Send invite</button>
+                        </div>
+                    </form>
+                    `);
+                });
 
-    hh.querySelector('#hh-delete-household').addEventListener('click', () => {
-        hh.popup(`Delete "${household.name}" household`, `
-        <p>Are you sure you want to delete this household permanently?<br>
-        Any data and user balances will be lost forever!</p>
-        <div class="spacer"></div>    
-        <button class="primary at-the-end" onclick="deleteHousehold('${household.hhid}')">
-            <span class="material-icons icn-18">delete_forever</span>
-            Delete
-        </button>
-        `);
-    });
+                hh.querySelector('#hh-leave-household').addEventListener('click', () => {
+                    hh.popup(`Leave "${household.name}" household`, `
+                    <p>Are you sure you want to leave this household permanently?<br>
+                    Any balance will be lost forever.</p>
+                    <div class="spacer"></div>    
+                    <button class="primary at-the-end" onclick="leaveHousehold('${household.hhid}', '${window.localStorage.getItem('userId')}')">Leave</button>
+                    `);
+                });
 
-    //Setup new expense buttons
-    hh.querySelector('.new-exp-rec').addEventListener('click', () => fillNewExpense(household, true));
-    hh.querySelector('.new-exp').addEventListener('click', () => {
-        fillNewExpense(household, false);
-    });
+                hh.querySelector('#hh-delete-household').addEventListener('click', () => {
+                    hh.popup(`Delete "${household.name}" household`, `
+                    <p>Are you sure you want to delete this household permanently?<br>
+                    Any data and user balances will be lost forever!</p>
+                    <div class="spacer"></div>    
+                    <button class="primary at-the-end" onclick="deleteHousehold('${household.hhid}')">
+                        <span class="material-icons icn-18">delete_forever</span>
+                        Delete
+                    </button>
+                    `);
+                });
 
-    //Setup name
-    hh.querySelector('.page-title').innerText = household.name;
+                // Setup interface
+                hh.querySelector('.new-exp-rec').addEventListener('click', () => fillNewExpense(household, true));
+                hh.querySelector('.new-exp').addEventListener('click', () => fillNewExpense(household, false));
+                hh.querySelector('.page-title').innerText = household.name;
 
-    showPage('#household');
+                // Load users
+                const userBox = document.querySelector('#hh-users');
+                while(userBox.firstChild) userBox.removeChild(userBox.firstChild);
+                household.users.forEach(u => {
+                    const uElement = document.createElement('li');
+                    uElement.dataset.id = u.uid;
+                    uElement.classList.add('user');
+                    uElement.innerHTML = `
+                        <div class="row gap-10">
+                            <span class="material-icons face">face</span>
+                            <p class="full-name">${u.name} ${u.surname}</p>
+                        </div>
+                        <p class="expense-count">${u.expenses} Expenses</p>
+                        <div class="row gap-10">
+                            <p class="balance">${u.balance} ${household.currency}</p>
+                            <span class="material-icons icn dots">more_vert</span>
+                        </div>
+                    `;
+                    userBox.appendChild(uElement);
+                });
+                
+
+                // Load recurring expenses
+                const recurringBox = document.querySelector('#hh-recurring');
+                while(recurringBox.firstChild) recurringBox.removeChild(recurringBox.firstChild);
+
+                if(household.recurringExpenses.length === 0){
+                    // Placeholder
+                    const placeholder = document.createElement('li');
+                    placeholder.classList.add('placeholder', 'expense');
+                    placeholder.innerHTML = `<p>There are currently no recurring expenses in this household</p>`;
+
+                    recurringBox.appendChild(placeholder);
+                } else {
+                    household.recurringExpenses.forEach(e => {
+                        const eElement = document.createElement('li');
+                        eElement.dataset.id = e.eid;
+                        eElement.classList.add('expense');
+                        eElement.innerHTML = `
+                            <div class="row gap-10">
+                                <span class="material-icons expense-icon">${e.icon}</span>
+                                <p class="title">${e.category}</p>
+                            </div>
+                            <p class="payer">${e.paidBy}</p>
+                            <p class="payers">${e.payers} people</p>
+                            <div class="row gap-10">
+                                <p class="amount">${e.amount} ${household.currency}</p>
+                                <span class="material-icons icn dots">more_vert</span>
+                            </div>
+                        `;
+                        recurringBox.appendChild(eElement);
+                    });
+                }
+
+                // Load regular expenses
+                const expenseBox = document.querySelector('#hh-expenses');
+                while(expenseBox.firstChild) expenseBox.removeChild(expenseBox.firstChild);
+
+                if(household.expenses.length === 0){
+                    // Placeholder
+                    const placeholder = document.createElement('li');
+                    placeholder.classList.add('placeholder', 'expense');
+                    placeholder.innerHTML = `<p>There are currently no expenses in this household</p>`;
+
+                    expenseBox.appendChild(placeholder);
+                } else {
+                    household.expenses.forEach(e => {
+                        const eElement = document.createElement('li');
+                        eElement.dataset.id = e.eid;
+                        eElement.classList.add('expense');
+                        eElement.innerHTML = `
+                            <div class="row gap-10">
+                                <span class="material-icons expense-icon">${e.icon}</span>
+                                <p class="title">${e.category}</p>
+                            </div>
+                            <p class="payer">${e.paidBy}</p>
+                            <p class="payers">${e.payers} people</p>
+                            <p>${timeAgo(e.date)}</p>
+                            <div class="row gap-10">
+                                <p class="amount">${e.amount} ${household.currency}</p>
+                                <span class="material-icons icn dots">more_vert</span>
+                            </div>
+                        `;
+                        expenseBox.appendChild(eElement);
+                    });
+                }
+
+                showPage('#household');
+            }
+            else {
+                inform(xhr.response, "failure");
+            }
+        };
+        xhr.send();
+    } catch(err) {
+        inform("Failed to load household. Unknown error occured", "failure");
+    }
+
+    
 }
 
 function fillNewExpense(household, recurringByDefault){
@@ -667,4 +779,79 @@ function initExpense(categories) {
     frequencies.forEach(f => {
         frequencyBox.addPick(f.id, `<p class="dye-active caps-title">${f.value}</p>`);
     });
+}
+
+// Returns how long ago specified date and time occured
+function timeAgo(dateString){
+    try {
+        const now = new Date(Date.now());
+        const date = new Date(dateString);
+        let result = "";
+
+        const nowM = now.getTime();
+        const dateM = date.getTime();
+        const diff = nowM - dateM;
+
+        if(diff < 0) return "???";
+        const year = Math.floor(diff / 31556952000);
+        const month = Math.floor(diff / 2592000000);
+        const day = Math.floor(diff / 86400000);
+        const hour = Math.floor(diff / 3600000);
+        const minute = Math.floor(diff / 60000);
+
+        let usedYear = false;
+        let usedMonth = false;
+        let usedDay = false;
+        let usedHour = false;
+        let usedMinute = false;
+
+        if(year > 0){
+            result += year + " year";
+            if(year > 1) result += "s";
+            usedYear = true;
+        }
+
+        if(!usedYear){
+            if(month % 12 > 0) {
+                if(usedYear) result += " "
+                result += (month % 12) + " month"
+                if(month % 12 > 1) result += "s";
+                usedMonth = true;
+            }
+        }
+
+        if(!usedYear && !usedMonth){
+            if(day > 0) {
+                result += day + " day";
+                if(day > 1) result += "s";
+                usedDay = true;
+            }
+        }
+
+        if(!usedYear && !usedMonth && !usedDay){
+            if(hour % 24 > 0){
+                result += (hour % 24) + " hour";
+                if(hour % 24 > 1) result += "s";
+                usedHour = true;
+            }
+        }
+
+        if(!usedYear && !usedMonth && !usedDay && !usedHour){
+            if(minute % 60 > 0){
+                if(usedHour) result += " ";
+                result += (minute % 60) + " min";
+                // if(minute % 60 > 1) result += "s";
+                usedMinute = true;
+            }
+        }
+
+        if(!usedYear && !usedMonth && !usedDay && !usedHour && !usedMinute){
+            result += "less than a minute";
+        }
+
+        return result + " ago";
+    } catch(err) {
+        console.log(err);
+        return "?";
+    }
 }

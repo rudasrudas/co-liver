@@ -602,7 +602,7 @@ p.note {
     gap: 15px;
     
     animation: disappear 1s forwards;
-    animation-delay: 10s;
+    animation-delay: 4s;
 }
 
 @keyframes disappear {

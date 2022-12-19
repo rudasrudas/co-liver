@@ -353,6 +353,14 @@ form .w-25 {
     align-items: center;
 }
 
+.expenses .placeholder {
+    border: dashed 2px var(--primary-gray);
+    color: var(--primary-gray);
+    font-style: italic;
+    min-height: 50px;
+    user-select: none;
+}
+
 .user-overview .user:hover, .expenses .expense:hover {
     background-color: var(--primary-light-gray);
 }
@@ -360,6 +368,10 @@ form .w-25 {
 .user-overview .face, .expense .expense-icon {
     font-size: 40px !important;
     user-select: none;
+}
+
+.expenses .expense p {
+    font-size: 14px;
 }
 
 .user-overview .balance, .expenses .amount {

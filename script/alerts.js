@@ -58,7 +58,7 @@ function inform(message, type) {
         try {
             hostElement.removeChild(box); 
         } catch (err) { }
-    }, 11000);
+    }, 5000);
 
     hostElement.insertBefore(box, hostElement.firstElementChild);
 }
