@@ -241,6 +241,7 @@ function updateSettingsUI(res) {
 
     document.querySelector('#pi-income').value = res.estimatedMonthlyIncome;
 
+    console.log(res.newsletter);
     document.querySelector('#pi-newsletter').setCheckbox(res.newsletter);
 
     const hhContainer = document.querySelector('#settings .hh-container');
@@ -261,9 +262,12 @@ function updateSettingsUI(res) {
         if(!hh.canLeave) hhBlock.querySelector('.hh-leave').style.display = 'none';
         hhBlock.querySelector('.hh-leave').addEventListener('click', () => {
             if(hh.canLeave){
-                if(confirm(`You're about to leave ${hh.name} household.\nAre you sure you intend to do so?`)){
-                    leaveHousehold(hh.hhid, window.localStorage.getItem("userId"));
-                }
+                hhBlock.popup(`Leave "${hh.name}" household`, `
+                    <p>Are you sure you want to leave this household permanently?<br>
+                    Any balance will be lost forever.</p>
+                    <div class="spacer"></div>    
+                    <button class="primary at-the-end" onclick="leaveHousehold('${hh.hhid}', '${window.localStorage.getItem('userId')}')">Leave</button>
+                `); 
             } 
         });
         hhContainer.appendChild(hhBlock);
@@ -332,7 +336,6 @@ function updatePersonalInfo(){
         xhr.send(JSON.stringify(json));
     } catch(err) {
         console.log(err);
-        return false;
     }
 
     return false;
@@ -433,13 +436,12 @@ function getHousehold(hhid){
         xhr.open('GET', `http://45.80.152.150/household/${hhid}`, true);
         xhr.allowJson();
         xhr.addToken();
-        xhr.setStandardTimeout();
+        // xhr.setStandardTimeout();
         xhr.setError();
         xhr.onload = function() {
             logOffUnauthenticated(xhr);
             if(xhr.status === 200){
                 const household = JSON.parse(xhr.response);
-                console.log(household);
 
                 // Setup top row buttons
                 hh.querySelector('#hh-invite-user').addEventListener('click', () => {
@@ -502,8 +504,8 @@ function getHousehold(hhid){
                             <span class="material-icons face">face</span>
                             <p class="full-name">${u.name} ${u.surname}</p>
                         </div>
-                        <p class="expense-count">${u.expenses} Expenses</p>
-                        <div class="row gap-10">
+                        <p class="expense-count justify-end">${u.expenses} Expenses</p>
+                        <div class="row gap-10 justify-end">
                             <p class="balance">${u.balance} ${household.currency}</p>
                             <span class="material-icons icn dots">more_vert</span>
                         </div>
@@ -628,22 +630,28 @@ function fillNewExpense(household, recurringByDefault){
             <span class="material-icons checkbox">checkbox</span>
             <p class="name">${user.name + ' ' + user.surname}</p>
             <div class="share-wrap percentage-input hidden">
-                <input type="number" class="share" max="100" min="0" step="0.1">
+                <input type="number" class="share" max="100" min="0" step="0.01">
             </div>
         `;
         const checkbox = payer.querySelector('.checkbox');
         const shareWrap = payer.querySelector('.share-wrap');
+        const percentage = payer.querySelector('input');
+
         checkbox.addEventListener('click', () => {
             if(payer.dataset.checked === 'true'){
                 payer.dataset.checked = 'false';
                 checkbox.classList.remove('active');
                 shareWrap.classList.add('hidden');
+                updatePayerSplitPercentages(household, percentage);
             } else {
                 payer.dataset.checked = 'true';
                 checkbox.classList.add('active');
                 shareWrap.classList.remove('hidden');
+                updatePayerSplitPercentages(household, percentage);
             }
         });
+        
+        percentage.addEventListener('input', () => { updatePayerSplitPercentages(household, percentage) });
 
         payerBox.appendChild(payer);
     });
@@ -654,6 +662,12 @@ function fillNewExpense(household, recurringByDefault){
     exp.querySelector('#payer-split-division').selectPick('div-equally');
     exp.querySelector('#exp-category').deselectPicks();
     exp.querySelector('#exp-rec-frequency').deselectPicks();
+
+    exp.querySelectorAll('#payer-split-division div').forEach(split => split.addEventListener('click', function() {
+        if(this.classList.contains('active')){
+            updatePayerSplitPercentages(household);
+        }
+    }));
 
     //Recurring checkbox
     exp.querySelector('#exp-is-recurring').setCheckbox(recurringByDefault);
@@ -667,6 +681,72 @@ function fillNewExpense(household, recurringByDefault){
     } 
 
     showPage('#expense');
+}
+
+function updatePayerSplitPercentages(household, callerInput) {
+    const splitType =  document.querySelector('#payer-split-division').getSelectedPickId();
+    const checkedUsers = document.querySelectorAll(`#exp-payers .payer[data-checked='true'] input`);
+    const checkedUserIds = [];
+    checkedUsers.forEach(u => checkedUserIds.push(u.parentElement.parentElement.dataset.id));
+    const checkedHouseholdUsers = household.users.filter(u => checkedUserIds.includes(u.uid));
+
+    if(callerInput){
+        if(callerInput.value > 100){
+            callerInput.value = 100;
+        }
+    }
+    
+    switch(splitType){
+        case 'div-equally':
+            checkedUsers.forEach(u => u.value = 100 / checkedUsers.length);
+            break;
+        case 'div-by-size':
+            let totalHouseholdSize = 0;
+            checkedHouseholdUsers.forEach(u => totalHouseholdSize += u.roomSize);
+            checkedUsers.forEach(u => {
+                let userRoomSize = 0;
+                household.users.forEach(hhu => {
+                    if(hhu.uid == u.parentElement.parentElement.dataset.id){
+                        userRoomSize = hhu.roomSize;
+                    } 
+                });
+                u.value = 100 / totalHouseholdSize * userRoomSize;
+            });
+            break;
+        default: //'div-individually'
+            const usersWithoutValues = [];
+            const usersWithValues = [];
+            checkedUsers.forEach(u => {
+                if(u.value > 0){ usersWithValues.push(u); }
+                else { 
+                    if(u !== callerInput) usersWithoutValues.push(u); 
+                }
+            });
+
+            let totalValueSum = 0;
+            usersWithValues.forEach(u => totalValueSum += parseFloat(u.value));
+
+            if(usersWithoutValues.length === 0){
+                const usersExceptThis = usersWithValues.filter(u => u !== callerInput);
+                if(totalValueSum > 100){
+                    let totalToSubtract = totalValueSum - 100;
+                    usersExceptThis.forEach(o => {
+                        if(parseFloat(o.value) < parseFloat(totalToSubtract/usersExceptThis.length)){
+                            totalToSubtract = parseFloat(parseFloat(totalToSubtract) - parseFloat(o.value));
+                            o.value = 0;
+                            usersExceptThis.pop(o);
+                        }
+                    });
+                    usersExceptThis.forEach(o => o.value = parseFloat(parseFloat(o.value) - parseFloat(totalToSubtract/usersExceptThis.length)));
+                } else if (totalValueSum < 100){
+                    const totalToAdd = 100 - totalValueSum;
+                    usersExceptThis.forEach(u => u.value = parseFloat(parseFloat(u.value) + parseFloat(totalToAdd/usersExceptThis.length)));
+                }
+            } else {
+                usersWithoutValues.forEach(u => u.value = parseFloat(parseFloat(100 - totalValueSum) / parseFloat(usersWithoutValues.length)));
+            }
+            break;
+    }
 }
 
 function postExpense(){
@@ -858,5 +938,12 @@ function timeAgo(dateString){
     } catch(err) {
         console.log(err);
         return "?";
+    }
+}
+
+function limitDecimalPlaces(e, count) {
+    if (e.target.value.indexOf('.') == -1) { return; }
+    if ((e.target.value.length - e.target.value.indexOf('.')) > count) {
+        e.target.value = parseFloat(e.target.value).toFixed(count);
     }
 }

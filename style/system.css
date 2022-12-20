@@ -247,6 +247,14 @@
     align-self: flex-end;
 }
 
+.justify-end {
+    justify-content: flex-end;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
 form .w-33 {
     width: 33%;
 }
@@ -373,6 +381,7 @@ form .w-25 {
 
 .user-overview .face, .expense .expense-icon {
     font-size: 40px !important;
+    width: 40px imp !important;
     user-select: none;
 }
 
@@ -388,6 +397,19 @@ form .w-25 {
     font-size: 20px !important;
     user-select: none;
     cursor: pointer;
+}
+
+#hh-users .user {
+    display: flex;
+    justify-content: stretch;
+}
+
+#hh-users .user > * {
+    flex: 1;
+}
+
+#hh-users .expense-count {
+    text-align: end;
 }
 
 #exp-payers {
@@ -410,7 +432,7 @@ form .w-25 {
 
 #exp-payers .payer .share {
     justify-self: flex-end;
-    width: 40px;
+    width: 50px;
     margin-left: 10px;
     border: none;
     background-color: var(--primary-medium-gray) !important;

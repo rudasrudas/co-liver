@@ -768,12 +768,12 @@ p.note {
 /* POPUP */
 
 div#popup-wrap.page {
-    position: absolute !important;
+    position: fixed !important;
     top: 0px;
 
     z-index: 3;
 
-    width: 100%;
+    width: var(--master-margin-width);
     height: 100vh;
     margin-left: -165px;
 
