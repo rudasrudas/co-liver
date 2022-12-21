@@ -118,43 +118,48 @@
             </form>
         </div>
         <div id="household" class="page">
-            <div class="page-top-margin"></div>
-            <div class="row spaced-out">
-                <div>
-                    <h2 class="page-title">Household name</h2>
-                    <p class="page-title-2">Household address</p>
+            <div class="top-page-background">
+                <div class="overlay">
+                    <div class="page-top-margin"></div>
+                    <div class="row spaced-out">
+                        <div>
+                            <h2 class="page-title">Household name</h2>
+                            <p class="page-title-2">Household address</p>
+                        </div>
+                        <div class="row gap-15 align-start">
+                            <button id="hh-settle-payments" class="page-top-btn primary small"><span class="material-icons icn">insights</span> Settle</button>
+                            <button id="hh-invite-user" class="page-top-btn secondary small"><span class="material-icons icn">person_add</span> Invite</button>
+                            <button id="hh-leave-household" class="page-top-btn secondary small"><span class="material-icons icn">logout</span> Leave</button>
+                            <button id="hh-delete-household" class="page-top-btn secondary small"><span class="material-icons icn">delete_forever</span> Delete</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="row gap-15">
-                    <button id="hh-settle-payments" class="page-top-btn primary small"><span class="material-icons icn">show_chart</span> Settle</button>
-                    <button id="hh-invite-user" class="page-top-btn secondary small"><span class="material-icons icn">person_add</span> Invite</button>
-                    <button id="hh-leave-household" class="page-top-btn secondary small"><span class="material-icons icn">logout</span> Leave</button>
-                    <button id="hh-delete-household" class="page-top-btn secondary small"><span class="material-icons icn">delete_forever</span> Delete</button>
+            </div>
+
+            <div style="z-index: 1">
+                <div class="spacer"></div>
+    
+                <h3 class="page-subtitle">Users</h3>
+                <ul class="user-overview" id="hh-users">
+                    <li class="user"></ul>
+    
+                <div class="spacer-2"></div>
+                <div class="row spaced-out align-end">
+                    <h3 class="page-subtitle no-margin">Recurring expenses</h3>
+                    <button class="secondary small new-exp-rec"><span class="material-icons icn">add</span> New</button>
                 </div>
+                <div class="spacer-small"></div>
+                <ul id="hh-recurring" class="expenses"></ul>
+    
+                <div class="spacer-2"></div>
+                <div class="row spaced-out align-end">
+                    <h3 class="page-subtitle no-margin">Expenses</h3>
+                    <button class="secondary small new-exp"><span class="material-icons icn">add</span> New</button>
+                </div>
+                <div class="spacer-small"></div>
+                <ul id="hh-expenses" class="expenses"></ul>
+                <div class="spacer-2"></div>
             </div>
-
-            <div class="spacer"></div>
-
-            <h3 class="page-subtitle">Users</h3>
-            <ul class="user-overview" id="hh-users">
-                <li class="user"></ul>
-
-            <div class="spacer-2"></div>
-            <div class="row spaced-out align-end">
-                <h3 class="page-subtitle no-margin">Recurring expenses</h3>
-                <button class="secondary small new-exp-rec"><span class="material-icons icn">add</span> New</button>
-            </div>
-            <div class="spacer-small"></div>
-            <ul id="hh-recurring" class="expenses"></ul>
-
-            <div class="spacer-2"></div>
-            <div class="row spaced-out align-end">
-                <h3 class="page-subtitle no-margin">Expenses</h3>
-                <button class="secondary small new-exp"><span class="material-icons icn">add</span> New</button>
-            </div>
-            <div class="spacer-small"></div>
-            <ul id="hh-expenses" class="expenses"></ul>
-            <div class="spacer-2"></div>
-
         </div>
         <div id="settings" class="page">
             <div class="page-top-margin"></div>

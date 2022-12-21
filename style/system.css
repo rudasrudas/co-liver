@@ -45,7 +45,7 @@
     flex-direction: row;
     justify-content: space-between;
     padding-bottom: 10px;
-    border-bottom: dotted 3px var(--primary-black);
+    border-bottom: solid 2px var(--primary-black);
 }
 
 .account-btns {
@@ -187,7 +187,27 @@
 }
 
 .page .page-top-margin {
-    margin-top: 65px;
+    padding-top: 55px;
+}
+
+.page .top-page-background {
+    background-image: url(/img/apartment3.jpg);
+    background-position-x: 50%;
+    background-position-y: 70%;
+    background-size: 100%;
+    z-index: 3 !important;
+    position: relative;
+    border-radius: 15px;
+}
+
+.top-page-background > .overlay {
+    background-image: linear-gradient(to bottom, #fff0, #ffffffef 90%);
+    padding: 10px;
+    z-index: 3;
+}
+
+#household {
+    /* z-index: 3; */
 }
 
 .spaced-out {
@@ -243,6 +263,10 @@
     align-items: flex-end;
 }
 
+.align-start {
+    align-items: flex-start;
+}
+
 .at-the-end {
     align-self: flex-end;
 }
@@ -253,6 +277,22 @@
 
 .justify-center {
     justify-content: center;
+}
+
+.expense-flow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: max-content;
+    flex: 1;
+}
+
+.expense-flow > .row {
+    align-items: center;
+}
+
+.expense-flow > .row > p {
+    line-height: 1;
 }
 
 form .w-33 {
@@ -395,6 +435,10 @@ form .w-25 {
     background-color: var(--primary-light-gray);
 }
 
+.expenses .expense:hover .dots {
+    opacity: 1;
+}
+
 .user-overview .face, .expense .expense-icon {
     font-size: 40px !important;
     width: 40px imp !important;
@@ -409,10 +453,17 @@ form .w-25 {
     font-weight: bold;
 }
 
-.user-overview .dots, .expenses .dots {
+.user-overview .dots{
     font-size: 20px !important;
     user-select: none;
     cursor: pointer;
+}
+
+.expenses .dots {
+    font-size: 20px !important;
+    user-select: none;
+    cursor: pointer;
+    opacity: 0;
 }
 
 #hh-users .user {

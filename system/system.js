@@ -162,6 +162,8 @@ function createHousehold(){
 }
 
 function getOverview(initializeFunctionality) {
+    showPage('#loading-page');
+
     const xhr = new XMLHttpRequest();
     xhr.open('GET', 'http://45.80.152.150/overview', true);
     xhr.allowJson();
@@ -442,33 +444,51 @@ function getHousehold(hhid){
             logOffUnauthenticated(xhr);
             if(xhr.status === 200){
                 const household = JSON.parse(xhr.response);
+                console.log(household.settlingPayments);
 
                 // Setup top row buttons
                 hh.querySelector('#hh-settle-payments').addEventListener('click', () => {
                     hh.popup(`Settle payments`, `
-                        <div style="width: 400px; min-height: 200px">
+                        <div style="width: 400px">
                             <p style="font-size: 12px">These payments can be made to reset everyone's accounts to zero</p>
                             <div class='payments'>
                                 <p class="placeholder">There are no payments to be made</p>
                             </div>
                         </div>
-                        <button class="primary at-the-end" style="width: fit-content" onclick="hidePopup()">Close</button>
+                        <div class="spacer"></div>
+                        <div class="row gap-10 at-the-end">
+                            <button class="secondary at-the-end" style="width: fit-content" onclick="hidePopup()">Close</button>
+                            <button id="hh-settle" class="primary at-the-end hidden" style="width: fit-content">Confirm payments</button>
+                        </div>
                     `);
 
                     const paymentBox = document.querySelector('#popup .payments');
+                    document.querySelector('#popup #hh-settle').addEventListener('click', () => {
+                        settle(household);
+                    });
                     if(household.settlingPayments.length > 0) paymentBox.removeChild(paymentBox.querySelector('.placeholder'));
 
-                    household.settlingPayments.forEach(p => {
+                    household.settlingPayments.forEach((p, i) => {
                         const payment = document.createElement('div');
                         payment.classList.add('payment', 'row', 'gap-10');
                         payment.innerHTML = `
-                            <span class="material-icons checkbox">checkbox</span>
-                            <p class="p-amount" style="font-weight: bold">${p.amount}</p>
-                            <p>from ${p.from.name} to ${p.to.name}</p>
+                            <div class="check">
+                                <p class="p-amount" style="font-weight: bold">${(p.amount).toFixed(2)} ${household.currency} </p>
+                                <p>  from ${p.from[0].name} ${p.from[0].surname} to ${p.to[0].name} ${p.to[0].surname}</p>
+                            </div>
                         `;
 
-                        const checkbox = payment.querySelector('.checkbox');
-                        checkbox.initCheckbox();
+                        const checkbox = payment.querySelector('.check');
+                        checkbox.dataset.paymentId = i;
+                        checkbox.initCheckbox(
+                            () => { document.querySelector('#hh-settle').classList.remove('hidden'); },
+                            () => {
+                                console.log(paymentBox.querySelectorAll(`.payment .check[data-checked='true']`))
+                                if(!paymentBox.querySelectorAll(`.payment .check[data-checked='true']`).length)
+                                    document.querySelector('#hh-settle').classList.add('hidden');
+                            },
+                            false
+                        );
 
                         paymentBox.appendChild(payment);
                     });
@@ -536,7 +556,7 @@ function getHousehold(hhid){
                         </div>
                         <p class="expense-count justify-end">${u.expenses} Expenses</p>
                         <div class="row gap-10 justify-end">
-                            <p class="balance">${u.balance} ${household.currency}</p>
+                            <p class="balance">${u.balance.toFixed(2)} ${household.currency}</p>
                             <span class="material-icons icn dots">more_vert</span>
                         </div>
                     `;
@@ -556,20 +576,30 @@ function getHousehold(hhid){
 
                     recurringBox.appendChild(placeholder);
                 } else {
+                    household.recurringExpenses.reverse();
                     household.recurringExpenses.forEach(e => {
+                        console.log(e);
                         const eElement = document.createElement('li');
                         eElement.dataset.id = e.eid;
                         eElement.classList.add('expense');
                         eElement.innerHTML = `
-                            <div class="row gap-10">
+                            <div class="row gap-10" style="width: 30%">
                                 <span class="material-icons expense-icon">${e.icon}</span>
                                 <p class="title">${e.name}</p>
                             </div>
-                            <p class="payer">${e.paidBy}</p>
-                            <p class="payers">${e.payers} people</p>
-                            <div class="row gap-10">
-                                <p class="amount">${e.amount} ${household.currency}</p>
-                                <span class="material-icons icn dots">more_vert</span>
+                            <div class="expense-flow">
+                                <div>
+                                    <p class="payer"><strong style="font-size: 12px">FROM</strong> ${e.paidBy}</p>
+                                    <p class="payers"><strong style="font-size: 12px">TO</strong> ${e.payers} people</p>
+                                </div>
+                                <div>
+                                    <p class="start-date">${(new Date(e.startDate)).toISOString().split('T')[0]}</p>
+                                    <p class="end-date">${(new Date(e.endDate)).toISOString().split('T')[0]}</p>
+                                </div>
+                                <div class="row gap-10">
+                                    <p class="amount">${e.amount.toFixed(2)} ${household.currency}</p>
+                                    <span class="material-icons icn dots">delete</span>
+                                </div>
                             </div>
                         `;
                         recurringBox.appendChild(eElement);
@@ -588,21 +618,26 @@ function getHousehold(hhid){
 
                     expenseBox.appendChild(placeholder);
                 } else {
+                    household.expenses.reverse();
                     household.expenses.forEach(e => {
                         const eElement = document.createElement('li');
                         eElement.dataset.id = e.eid;
                         eElement.classList.add('expense');
                         eElement.innerHTML = `
-                            <div class="row gap-10">
+                            <div class="row gap-10" style="width: 30%">
                                 <span class="material-icons expense-icon">${e.icon}</span>
                                 <p class="title">${e.name}</p>
                             </div>
-                            <p class="payer">${e.paidBy}</p>
-                            <p class="payers">${e.payers} people</p>
-                            <p>${timeAgo(e.date)}</p>
-                            <div class="row gap-10">
-                                <p class="amount">${e.amount} ${household.currency}</p>
-                                <span class="material-icons icn dots">more_vert</span>
+                            <div class="expense-flow">
+                                <div>
+                                    <p class="payer"><strong style="font-size: 12px">FROM</strong> ${e.paidBy}</p>
+                                    <p class="payers"><strong style="font-size: 12px">TO</strong> ${e.payers} people</p>
+                                </div>
+                                <p>${timeAgo(e.date)}</p>
+                                <div class="row gap-10">
+                                    <p class="amount">${e.amount.toFixed(2)} ${household.currency}</p>
+                                    <span class="material-icons icn dots hidden">delete</span>
+                                </div>
                             </div>
                         `;
                         expenseBox.appendChild(eElement);
@@ -621,6 +656,52 @@ function getHousehold(hhid){
     }
 
     
+}
+
+async function settle(household){
+    const checkedPayments = Array.from(document.querySelectorAll(`#popup .payments .payment .check[data-checked='true']`)).map(d => d.dataset.paymentId );
+    const paymentsToSettle = household.settlingPayments.filter((p, i) => {
+        return checkedPayments.includes(`${i}`);
+    });
+
+    for await(const payment of paymentsToSettle){
+        await settleExpense(household, payment);
+        household.settlingPayments.pop(payment);
+    }
+
+    hidePopup();
+    getHousehold(household.hhid);
+}
+
+function settleExpense(household, payment){
+    return new Promise((resolve, reject) => {
+        const json = {
+            "cid": '639730f83771f1438c41f34c',
+            "amount": payment.amount,
+            "name": "Settlement",
+            "paidBy": payment.to[0]._id,
+            "payers": [{
+                "percentageToPay": 100,
+                "uid": payment.from[0]._id
+            }],
+            "recurring": null
+        };
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://45.80.152.150/expense?household=' + household.hhid, true);
+        xhr.allowJson();
+        xhr.addToken();
+        xhr.setStandardTimeout();
+        xhr.setError();
+        xhr.onload = () => {
+            if(xhr.status === 200){
+                resolve(xhr.response);
+            } else {
+                reject();
+            }
+        };
+        xhr.send(JSON.stringify(json));
+    });
 }
 
 function fillNewExpense(household, recurringByDefault){
@@ -648,9 +729,9 @@ function fillNewExpense(household, recurringByDefault){
     while(payerBox.firstChild) payerBox.removeChild(payerBox.firstChild);
     
     household.users.forEach(user => {
-        paidBy.addPick(user._id, `<p class="dye-active title">${user.name + ' ' + user.surname}</p>`);
+        paidBy.addPick(user.uid, `<p class="dye-active title">${user.name + ' ' + user.surname}</p>`);
 
-        if(user._id === household.self) paidBy.selectPick(user._id);
+        if(user.uid === household.self) paidBy.selectPick(user.uid);
         
         const payer = document.createElement('div');
         payer.dataset.id = user.uid;
@@ -790,6 +871,7 @@ function postExpense(){
         let frequency = exp.querySelector("#exp-rec-frequency").getSelectedPickId();
         const amount = exp.querySelector("#exp-amount").value;
         const name = exp.querySelector("#exp-name").value;
+        const paidBy = exp.querySelector("#exp-paid-by").getSelectedPickId();
         const payers = [];
         if(household) {
             exp.querySelectorAll("#exp-payers .payer[data-checked='true']").forEach(payer => {
@@ -814,6 +896,7 @@ function postExpense(){
             "cid": cid,
             "amount": amount,
             "name": name,
+            "paidBy": paidBy,
             "payers": payers,
             "recurring": recurring
         };
@@ -972,8 +1055,10 @@ function timeAgo(dateString){
 }
 
 function limitDecimalPlaces(e, count) {
-    if (e.target.value.indexOf('.') == -1) { return; }
-    if ((e.target.value.length - e.target.value.indexOf('.')) > count) {
-        e.target.value = parseFloat(e.target.value).toFixed(count);
-    }
+    // if (e.indexOf('.') == -1) { return; }
+    // if ((e.length - e.indexOf('.')) > count) {
+    //     e = parseFloat(e).toFixed(count);
+    // }
+
+    return parseFloat(e).toFixed(count);
 }

@@ -73,7 +73,7 @@ HTMLElement.prototype.deselectPicks = function(){
 //Initialize checkbox
 HTMLElement.prototype.initCheckbox = function(activate, deactivate, defaultValue){
     this.classList.add('row', 'checkbox-align');
-    const text = this.innerText;
+    const text = this.innerHTML;
     this.activateFunc = activate;
     this.deactivateFunc = deactivate;
     this.innerHTML = `
@@ -99,7 +99,7 @@ HTMLElement.prototype.initCheckbox = function(activate, deactivate, defaultValue
         this.checkFunc();
     });
 
-    this.dataset.checked = defaultValue ? 'true' : 'false';
+    this.dataset.checked = !defaultValue ? 'true' : 'false';
     this.checkFunc();
 }
 
