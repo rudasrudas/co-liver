@@ -827,3 +827,17 @@ div#popup-wrap.page {
     cursor: pointer;
     user-select: none;
 }
+
+.deleting {
+    animation: deleting-pulse 2s infinite linear;
+}
+
+@keyframes deleting-pulse {
+    0% {opacity: 0;}
+    20% {opacity: 1;}
+    40% {opacity: 0;}
+    60% {opacity: 1;}
+    80% {opacity: 0;}
+    90% {opacity: 1;}
+    100% {opacity: 0;}
+}

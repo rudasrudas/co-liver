@@ -68,7 +68,11 @@ function initOverviewFunctionality(res){
     const overviewBtn = document.querySelector('#overview-link');
     const addHouseholdBtn = document.querySelector('#add-household-link');
     const settingsBtn = document.querySelector('#settings-link');
-    initChangePage(overviewBtn, getOverview, true);
+    initChangePage(overviewBtn, () => {
+        overviewBtn.classList.add('active');
+        getOverview();
+    }, true);
+
     addHouseholdBtn.addEventListener('click', () => {
         addHouseholdBtn.popup('Add new household', `
         <form style="width: 400px" onsubmit="return joinByKey()">
@@ -95,7 +99,10 @@ function initOverviewFunctionality(res){
         </form>
         `);
     });
-    initChangePage(settingsBtn, getSettings, true);
+    initChangePage(settingsBtn, () => {
+        settingsBtn.classList.add('active');
+        getSettings();
+    }, true);
 
     //Show overview by default
     overviewBtn.classList.add('active');
@@ -195,7 +202,10 @@ function initHouseholdNavigationUI(household) {
     const pHouseholdElement = document.createElement('p');
     pHouseholdElement.dataset.id = household.hhid;
     pHouseholdElement.innerHTML = '<span class="material-icons icn">home</span> ' + household.name;
-    initChangePage(pHouseholdElement, () => { return getHousehold(household.hhid); }, true); //Click functionality
+    initChangePage(pHouseholdElement, () => { 
+        pHouseholdElement.classList.add('active');
+        return getHousehold(household.hhid);
+    }, true); //Click functionality
 
     const ulHouseholdElement = document.createElement('ul');
     if(household.users){
@@ -444,12 +454,11 @@ function getHousehold(hhid){
             logOffUnauthenticated(xhr);
             if(xhr.status === 200){
                 const household = JSON.parse(xhr.response);
-                console.log(household.settlingPayments);
 
                 // Setup top row buttons
                 hh.querySelector('#hh-settle-payments').addEventListener('click', () => {
                     hh.popup(`Settle payments`, `
-                        <div style="width: 400px">
+                        <div style="min-width: 400px">
                             <p style="font-size: 12px">These payments can be made to reset everyone's accounts to zero</p>
                             <div class='payments'>
                                 <p class="placeholder">There are no payments to be made</p>
@@ -473,8 +482,7 @@ function getHousehold(hhid){
                         payment.classList.add('payment', 'row', 'gap-10');
                         payment.innerHTML = `
                             <div class="check">
-                                <p class="p-amount" style="font-weight: bold">${(p.amount).toFixed(2)} ${household.currency} </p>
-                                <p>  from ${p.from[0].name} ${p.from[0].surname} to ${p.to[0].name} ${p.to[0].surname}</p>
+                                <p><strong>${(p.amount).toFixed(2)} ${household.currency}</strong> from ${p.from[0].name} ${p.from[0].surname} to ${p.to[0].name} ${p.to[0].surname}</p>
                             </div>
                         `;
 
@@ -483,7 +491,6 @@ function getHousehold(hhid){
                         checkbox.initCheckbox(
                             () => { document.querySelector('#hh-settle').classList.remove('hidden'); },
                             () => {
-                                console.log(paymentBox.querySelectorAll(`.payment .check[data-checked='true']`))
                                 if(!paymentBox.querySelectorAll(`.payment .check[data-checked='true']`).length)
                                     document.querySelector('#hh-settle').classList.add('hidden');
                             },
@@ -578,7 +585,6 @@ function getHousehold(hhid){
                 } else {
                     household.recurringExpenses.reverse();
                     household.recurringExpenses.forEach(e => {
-                        console.log(e);
                         const eElement = document.createElement('li');
                         eElement.dataset.id = e.eid;
                         eElement.classList.add('expense');
@@ -590,7 +596,7 @@ function getHousehold(hhid){
                             <div class="expense-flow">
                                 <div>
                                     <p class="payer"><strong style="font-size: 12px">FROM</strong> ${e.paidBy}</p>
-                                    <p class="payers"><strong style="font-size: 12px">TO</strong> ${e.payers} people</p>
+                                    <p class="payers"><strong style="font-size: 12px">TO</strong> ${e.payers}</p>
                                 </div>
                                 <div>
                                     <p class="start-date">${(new Date(e.startDate)).toISOString().split('T')[0]}</p>
@@ -631,15 +637,18 @@ function getHousehold(hhid){
                             <div class="expense-flow">
                                 <div>
                                     <p class="payer"><strong style="font-size: 12px">FROM</strong> ${e.paidBy}</p>
-                                    <p class="payers"><strong style="font-size: 12px">TO</strong> ${e.payers} people</p>
+                                    <p class="payers"><strong style="font-size: 12px">TO</strong> ${e.payers}</p>
                                 </div>
                                 <p>${timeAgo(e.date)}</p>
                                 <div class="row gap-10">
                                     <p class="amount">${e.amount.toFixed(2)} ${household.currency}</p>
-                                    <span class="material-icons icn dots hidden">delete</span>
+                                    <span class="material-icons icn dots hidden delete">delete</span>
                                 </div>
                             </div>
                         `;
+                        eElement.querySelector('.delete').addEventListener('click', () => {
+                            deleteExpense(e.eid, eElement);
+                        });
                         expenseBox.appendChild(eElement);
                     });
                 }
@@ -654,22 +663,40 @@ function getHousehold(hhid){
     } catch(err) {
         inform("Failed to load household. Unknown error occured", "failure");
     }
+}
 
-    
+function deleteExpense(eid, expenseElement){
+    const xhr = new XMLHttpRequest();
+    xhr.open('DELETE', `http://45.80.152.150/expense/${eid}`, true);
+    xhr.allowJson();
+    xhr.addToken();
+    xhr.setStandardTimeout();
+    xhr.setError();
+    xhr.onload = () => {
+        if(xhr.status === 200){
+            expenseElement.classList.add('hidden');
+        } else {
+            inform("Failed to delete expense. Please refresh and try again", "failure");
+            expenseElement.classList.remove('deleting');
+        }
+    };
+    xhr.send();
+    expenseElement.classList.add('deleting');
 }
 
 async function settle(household){
-    const checkedPayments = Array.from(document.querySelectorAll(`#popup .payments .payment .check[data-checked='true']`)).map(d => d.dataset.paymentId );
+    const checkedPayments = Array.from(document.querySelectorAll(`.payments .payment .check[data-checked='true']`)).map(d => d.dataset.paymentId );
     const paymentsToSettle = household.settlingPayments.filter((p, i) => {
         return checkedPayments.includes(`${i}`);
     });
+    hidePopup();
+    showPage('#loading-page');
 
     for await(const payment of paymentsToSettle){
         await settleExpense(household, payment);
         household.settlingPayments.pop(payment);
     }
 
-    hidePopup();
     getHousehold(household.hhid);
 }
 
@@ -695,6 +722,7 @@ function settleExpense(household, payment){
         xhr.setError();
         xhr.onload = () => {
             if(xhr.status === 200){
+                console.log(xhr.response);
                 resolve(xhr.response);
             } else {
                 reject();
@@ -741,7 +769,7 @@ function fillNewExpense(household, recurringByDefault){
             <span class="material-icons checkbox">checkbox</span>
             <p class="name">${user.name + ' ' + user.surname}</p>
             <div class="share-wrap percentage-input hidden">
-                <input type="number" class="share" max="100" min="0" step="0.01">
+                <input type="number" class="share" max="100" min="0">
             </div>
         `;
         const checkbox = payer.querySelector('.checkbox');
@@ -1052,13 +1080,4 @@ function timeAgo(dateString){
         console.log(err);
         return "?";
     }
-}
-
-function limitDecimalPlaces(e, count) {
-    // if (e.indexOf('.') == -1) { return; }
-    // if ((e.length - e.indexOf('.')) > count) {
-    //     e = parseFloat(e).toFixed(count);
-    // }
-
-    return parseFloat(e).toFixed(count);
 }

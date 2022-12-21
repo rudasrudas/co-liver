@@ -435,10 +435,6 @@ form .w-25 {
     background-color: var(--primary-light-gray);
 }
 
-.expenses .expense:hover .dots {
-    opacity: 1;
-}
-
 .user-overview .face, .expense .expense-icon {
     font-size: 40px !important;
     width: 40px imp !important;
@@ -459,11 +455,17 @@ form .w-25 {
     cursor: pointer;
 }
 
-.expenses .dots {
+.expenses .expense .dots {
     font-size: 20px !important;
     user-select: none;
     cursor: pointer;
     opacity: 0;
+    width: 0px;
+}
+
+.expenses .expense:hover .dots {
+    opacity: 1;
+    width: auto;
 }
 
 #hh-users .user {
