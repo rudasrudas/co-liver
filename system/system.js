@@ -444,6 +444,36 @@ function getHousehold(hhid){
                 const household = JSON.parse(xhr.response);
 
                 // Setup top row buttons
+                hh.querySelector('#hh-settle-payments').addEventListener('click', () => {
+                    hh.popup(`Settle payments`, `
+                        <div style="width: 400px; min-height: 200px">
+                            <p style="font-size: 12px">These payments can be made to reset everyone's accounts to zero</p>
+                            <div class='payments'>
+                                <p class="placeholder">There are no payments to be made</p>
+                            </div>
+                        </div>
+                        <button class="primary at-the-end" style="width: fit-content" onclick="hidePopup()">Close</button>
+                    `);
+
+                    const paymentBox = document.querySelector('#popup .payments');
+                    if(household.settlingPayments.length > 0) paymentBox.removeChild(paymentBox.querySelector('.placeholder'));
+
+                    household.settlingPayments.forEach(p => {
+                        const payment = document.createElement('div');
+                        payment.classList.add('payment', 'row', 'gap-10');
+                        payment.innerHTML = `
+                            <span class="material-icons checkbox">checkbox</span>
+                            <p class="p-amount" style="font-weight: bold">${p.amount}</p>
+                            <p>from ${p.from.name} to ${p.to.name}</p>
+                        `;
+
+                        const checkbox = payment.querySelector('.checkbox');
+                        checkbox.initCheckbox();
+
+                        paymentBox.appendChild(payment);
+                    });
+                });
+
                 hh.querySelector('#hh-invite-user').addEventListener('click', () => {
                     hh.popup(`Invite new user to "${household.name}"`, `
                     <form style="width: 400px" onsubmit="return sendInvite('${household.hhid}')">

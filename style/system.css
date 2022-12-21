@@ -367,12 +367,28 @@ form .w-25 {
     align-items: center;
 }
 
-.expenses .placeholder {
+.expenses .placeholder, .payments .placeholder {
     border: dashed 2px var(--primary-gray);
     color: var(--primary-gray);
     font-style: italic;
     min-height: 50px;
     user-select: none;
+}
+
+.payments {
+    padding: 10px 0px;
+}
+
+.payments .placeholder {
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    border: dashed 2px var(--primary-gray);
+    color: var(--primary-gray);
+    font-style: italic;
+    min-height: 50px;
+    user-select: none;
+    padding: 0px 10px;
 }
 
 .user-overview .user:hover, .expenses .expense:hover {
