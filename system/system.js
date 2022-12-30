@@ -262,8 +262,8 @@ function showOverview(month) {
 function createChart(data, total) {
     document.querySelector("#chart").innerHTML = "";
 
-    const width = 450;
-    const height = 450;
+    const width = 700;
+    const height = 700;
     const margin = 40;
     const radius = Math.min(width, height) / 2 - margin;
 
@@ -302,7 +302,7 @@ function createChart(data, total) {
     .data(data_ready)
     .enter()
     .append('text')
-    .text(function(d){ return d.data.key + " " + ((d.data.value / total).toFixed(2) * 100) + "%"})
+    .text(function(d){ return d.data.key + " " + ((d.data.value / total) * 100).toFixed(2) + "%"})
     .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
     .style("text-anchor", "middle")
     .style("font-size", 17);
