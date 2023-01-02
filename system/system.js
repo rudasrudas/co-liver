@@ -168,6 +168,8 @@ function createHousehold(){
     return false;
 }
 
+
+// Overview chart
 function getOverview(initializeFunctionality) {
     showPage('#loading-page');
 
@@ -276,7 +278,7 @@ function createChart(data, total) {
 
     const color = d3.scaleOrdinal()
     .domain(data)
-    .range(d3.schemeSet2);
+    .range(["#fcaa8e","#fc8a6b","#f9694c","#ef4533","#d92723","#bb151a","#970b13","#67000d"]);
 
     const pie = d3.pie()
     .value(function(d) {return d.value; })
