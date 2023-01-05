@@ -170,6 +170,8 @@ function createHousehold(){
     return false;
 }
 
+
+// Overview chart
 function getOverview(initializeFunctionality) {
     if(initializeFunctionality){
         document.querySelectorAll('#menu > *').forEach(a => a.classList.add('hidden'));
@@ -195,12 +197,125 @@ function getOverview(initializeFunctionality) {
                 document.querySelector('#menu').classList.remove('waving');
             }
             window.localStorage.setItem("userId", JSON.parse(xhr.response).user.uid);
+            updateOverviewUI(JSON.parse(xhr.response));
             showPage('#overview');
         } else {
-            inform("Failed to load overview", "failure");
+            inform(`Failed to get overview (${xhr.response})`, "failure");
         }
     };
     xhr.send();
+}
+
+let expenditures = {};
+
+function updateOverviewUI(res) {
+    initMonthData();
+    const currentDate = new Date();
+    const minDate = new Date(currentDate.getFullYear(), currentDate.getMonth());
+    minDate.setMonth(minDate.getMonth() - 11);
+    for (const expense of res.expenses) {
+        const date = new Date(expense.date);
+        if (date >= minDate) {
+            const expenseCategory = expense.category[0].title;
+            const monthName = date.toLocaleString('default', { month: 'long' });
+            const monthExpenditures = expenditures[monthName];
+            if (monthExpenditures[expenseCategory] === undefined) {
+                monthExpenditures[expenseCategory] = expense.amount;
+            }
+            else {
+                monthExpenditures[expenseCategory] += expense.amount;
+            }
+        }
+    }
+
+    showOverview(currentDate.toLocaleString('default', { month: 'long' }));
+}
+
+function initMonthData() {
+    expenditures = {};
+    const currentMonth = new Date().getMonth();
+    const date = new Date(new Date().getFullYear(), currentMonth);
+    let overviewMonthsHtml = "";
+    for (let i = 11; i > -1; i--) {
+        date.setMonth(currentMonth - i);
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        expenditures[monthName] = {};
+        overviewMonthsHtml += `<a id="${monthName.toLowerCase()}" class="month" onclick="showOverview('${monthName}')">${monthName}</a>`;
+    }
+
+    document.querySelector('#overview-months').innerHTML = overviewMonthsHtml;
+}
+
+function showOverview(month) {
+    const currentMonth = document.querySelector(".current-month");
+    if (currentMonth !== null) {
+        currentMonth.classList.remove("current-month");
+    }
+
+    document.querySelector(`#${month.toLowerCase()}`).classList.add("current-month");
+
+    const data = expenditures[month];
+
+    let total = 0;
+    for (var amount of Object.values(data)) {
+        total += amount;
+    }
+
+    if (Object.keys(data).length === 0) {
+        document.querySelector("#chart").innerHTML = "No expenses for this month.";
+        return;
+    }
+
+    createChart(data, total);
+}
+
+function createChart(data, total) {
+    document.querySelector("#chart").innerHTML = "";
+
+    const width = 700;
+    const height = 700;
+    const margin = 40;
+    const radius = Math.min(width, height) / 2 - margin;
+
+    const svg = d3.select("#chart")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    const color = d3.scaleOrdinal()
+    .domain(data)
+    .range(["#fcaa8e","#fc8a6b","#f9694c","#ef4533","#d92723","#bb151a","#970b13","#67000d"]);
+
+    const pie = d3.pie()
+    .value(function(d) {return d.value; })
+    const data_ready = pie(d3.entries(data));
+
+    const arcGenerator = d3.arc()
+    .innerRadius(0)
+    .outerRadius(radius);
+
+    svg
+    .selectAll('mySlices')
+    .data(data_ready)
+    .enter()
+    .append('path')
+    .attr('d', arcGenerator)
+    .attr('fill', function(d){ return(color(d.data.key)) })
+    .attr("stroke", "black")
+    .style("stroke-width", "2px")
+    .style("opacity", 0.7);
+
+    svg
+    .selectAll('mySlices')
+    .data(data_ready)
+    .enter()
+    .append('text')
+    .text(function(d){ return d.data.key + " " + ((d.data.value / total) * 100).toFixed(2) + "%"})
+    .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
+    .style("text-anchor", "middle")
+    .style("font-size", 17);
 }
 
 function initHouseholdNavigationUI(household) {

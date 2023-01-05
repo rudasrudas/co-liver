@@ -596,3 +596,33 @@ input::-webkit-inner-spin-button {
     margin: 3px;
     border-radius: 5px;
 }
+
+#overview-months {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.month {
+    margin-right: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    padding:5px;
+    border-radius: 15px;
+}
+.month:hover {
+    background-color: #ffa79e;
+}
+
+.current-month {
+    color: #ffa79e;
+}
+
+.current-month:hover {
+    color: #ff5757;
+
+}
+
+#chart {
+    font-family: 'Work Sans 400', sans-serif;
+    font-size:x-large !important;
+}

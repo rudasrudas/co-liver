@@ -17,8 +17,8 @@
     <script src="/script/popup.js"></script>
     <script src="/script/loading.js"></script>
     <script src="/system/system.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
-    <script src="/script/chart.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 </head>
 <body class="master-margin" id="system">
     <div id="sidebar">
@@ -48,11 +48,14 @@
                 </div>
             </div>
         </div>
+
         <div id="overview" class="page">
             <div class="page-top-margin"></div>
             <h2 class="page-title">Overview</h2>
+            <div id="overview-months"></div>
             <div id="chart"></div>
         </div>
+
         <div id="expense" class="page">
             <div class="page-top-margin"></div>
             <h2 class="page-title">Add new expense</h2>
