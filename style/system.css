@@ -38,6 +38,28 @@
     padding: 15px;
 }
 
+#menu.waving {
+    animation: waving 50s linear infinite;
+}
+
+@keyframes waving {
+    0% { 
+        background-size: 500%;
+        background-position-x: -150px;
+        background-position-y: -100px;
+    }
+    66% {
+        background-size: 520%;
+        background-position-x: -100px;
+        background-position-y: -150px;
+    }
+    100% {
+        background-size: 500%;
+        background-position-x: -150px;
+        background-position-y: -100px;
+    }
+}
+
 .account-info {
     width: 100%;
     height: auto;
@@ -279,6 +301,10 @@
     justify-content: center;
 }
 
+.flex-2 {
+    flex: 2 !important;
+}
+
 .expense-flow {
     display: flex;
     justify-content: space-between;
@@ -445,6 +471,11 @@ form .w-25 {
     font-size: 14px;
 }
 
+.expenses .expense .frequency {
+    text-transform: capitalize;
+    font-weight: bold;
+}
+
 .user-overview .balance, .expenses .amount {
     font-weight: bold;
 }
@@ -453,6 +484,9 @@ form .w-25 {
     font-size: 20px !important;
     user-select: none;
     cursor: pointer;
+
+    opacity: 0;
+    width: 0px;
 }
 
 .expenses .expense .dots {
@@ -463,9 +497,32 @@ form .w-25 {
     width: 0px;
 }
 
-.expenses .expense:hover .dots {
+.expenses .expense:hover .dots, .user:hover .dots {
     opacity: 1;
     width: auto;
+}
+
+#household-tips {
+    position: absolute;
+    /* margin-top: 250px; */
+    bottom: 45px;
+    width: 400px;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-gray);
+}
+
+#household-tips span.material-icons {
+    width: 30px;
+    font-size: 30px !important;
+}
+
+#household-tips p {
+    text-align: left;
+    font-size: 14px; 
 }
 
 #hh-users .user {
@@ -524,4 +581,18 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.admin-tag::after {
+    content: 'admin';
+    background-color: var(--primary-red);
+    color: var(--primary-white);
+
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+
+    padding: 3px 5px;
+    margin: 3px;
+    border-radius: 5px;
 }

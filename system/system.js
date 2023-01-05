@@ -25,17 +25,14 @@ window.onload = () => {
 }
 
 function initChangePage(btnElement, functionality, customLoading){
-    const active = 'active';
-    const menuBtns = document.querySelectorAll("#navigation > p");
     const pages = document.querySelectorAll("#system-content > .page");
 
     btnElement.addEventListener('click', () => {
         showPage('#loading-page');
         functionality();
-        Array.from(menuBtns).forEach(g => g.classList.remove(active));
         if(!customLoading){
-            Array.from(pages).forEach(g => g.classList.remove(active));
-            btnElement.classList.add(active);
+            pages.forEach(g => g.classList.remove('active'));
+            btnElement.classList.add('active');
         }
         let activePage = null;
         if(btnElement.id === 'overview-link') activePage = '#overview';
@@ -44,7 +41,7 @@ function initChangePage(btnElement, functionality, customLoading){
         else activePage = `#system-content #household`;
         // else activePage = `#system-content .page[data-id='${btnElement.dataset.id}']`;
         
-        if(activePage && !customLoading) document.querySelector(activePage).classList.add(active);
+        if(activePage && !customLoading) document.querySelector(activePage).classList.add('active');
     });
 }
 
@@ -69,6 +66,7 @@ function initOverviewFunctionality(res){
     const addHouseholdBtn = document.querySelector('#add-household-link');
     const settingsBtn = document.querySelector('#settings-link');
     initChangePage(overviewBtn, () => {
+        resetNav();
         overviewBtn.classList.add('active');
         getOverview();
     }, true);
@@ -100,6 +98,7 @@ function initOverviewFunctionality(res){
         `);
     });
     initChangePage(settingsBtn, () => {
+        resetNav();
         settingsBtn.classList.add('active');
         getSettings();
     }, true);
@@ -157,7 +156,10 @@ function createHousehold(){
     xhr.onload = function() {
         logOffUnauthenticated(xhr);
         if(xhr.status === 200){
-            inform("Successfully created the household!", "success");
+            const household = JSON.parse(xhr.response);
+            inform(`Successfully created household "${household.name}"!`, "success");
+            initHouseholdNavigationUI(household);
+            getHousehold(household.hhid);
         } else {
             inform(`Failed to create household (${xhr.response}). Server responded with status code ${xhr.status}`, "failure");
         }
@@ -169,6 +171,10 @@ function createHousehold(){
 }
 
 function getOverview(initializeFunctionality) {
+    if(initializeFunctionality){
+        document.querySelectorAll('#menu > *').forEach(a => a.classList.add('hidden'));
+        document.querySelector('#menu').classList.add('waving');
+    }
     showPage('#loading-page');
 
     const xhr = new XMLHttpRequest();
@@ -185,9 +191,13 @@ function getOverview(initializeFunctionality) {
                 initExpense(JSON.parse(xhr.response).categories);
                 initHousehold();
                 initSettings();
+                document.querySelectorAll('#menu > *').forEach(a => a.classList.remove('hidden'));
+                document.querySelector('#menu').classList.remove('waving');
             }
             window.localStorage.setItem("userId", JSON.parse(xhr.response).user.uid);
             showPage('#overview');
+        } else {
+            inform("Failed to load overview", "failure");
         }
     };
     xhr.send();
@@ -203,6 +213,7 @@ function initHouseholdNavigationUI(household) {
     pHouseholdElement.dataset.id = household.hhid;
     pHouseholdElement.innerHTML = '<span class="material-icons icn">home</span> ' + household.name;
     initChangePage(pHouseholdElement, () => { 
+        resetNav();
         pHouseholdElement.classList.add('active');
         return getHousehold(household.hhid);
     }, true); //Click functionality
@@ -274,7 +285,7 @@ function updateSettingsUI(res) {
         if(!hh.canLeave) hhBlock.querySelector('.hh-leave').style.display = 'none';
         hhBlock.querySelector('.hh-leave').addEventListener('click', () => {
             if(hh.canLeave){
-                hhBlock.popup(`Leave "${hh.name}" household`, `
+                hhBlock.popup(`Leave "${hh.name}" household?`, `
                     <p>Are you sure you want to leave this household permanently?<br>
                     Any balance will be lost forever.</p>
                     <div class="spacer"></div>    
@@ -353,15 +364,20 @@ function updatePersonalInfo(){
     return false;
 }
 
-function loadPage(){
-    const pages = document.querySelectorAll("#system-content > .page");
-    Array.from(pages).forEach(g => g.classList.remove('active'));
-    document.querySelector('#loading-page').classList.add('active');
-}
-
 function showPage(pageToOpen){
+    const tips = [
+        "You can zero everyone's debt in the household by using the Settle function!",
+        "Make sure to specify your estimated monthly income in the settings to have a better overview of your finances!",
+        "Make sure to specify your room size in the settings to incorporate splitting the expenses by everyone's room sizes!",
+        "If your income for a specific month is different than estimated, you can change it in your overview page!",
+        "Subscribe to our newsletter to receive tips and newly released updates!"
+    ]
+
+    const tipElement = document.querySelector("#household-tips > p");
+    tipElement.innerText = tips[parseInt(Math.random() * tips.length)];
+
     const pages = document.querySelectorAll("#system-content > .page");
-    Array.from(pages).forEach(g => g.classList.remove('active'));    
+    pages.forEach(g => g.classList.remove('active'));  
     document.querySelector(pageToOpen).classList.add('active');
 }
 
@@ -375,9 +391,13 @@ function leaveHousehold(hhid, uid){
     xhr.onload = function() {
         logOffUnauthenticated(xhr);
         if(xhr.status === 200){
-            inform("Successfully left the household!", "success");
-            getOverview();
-            getSettings();
+            if(uid === window.localStorage.getItem("userId")){
+                inform("Successfully left the household!", "success");
+                getOverview(true);
+            } else {
+                inform(`Successfully removed person from the household!`, "success");
+                getHousehold(hhid);
+            }
         }
         else if (xhr.status === 430){
             showError('#error-msg', xhr.response);
@@ -459,7 +479,8 @@ function getHousehold(hhid){
                 hh.querySelector('#hh-settle-payments').addEventListener('click', () => {
                     hh.popup(`Settle payments`, `
                         <div style="min-width: 400px">
-                            <p style="font-size: 12px">These payments can be made to reset everyone's accounts to zero</p>
+                            <p style="font-size: 12px">These suggested payments can be made to reset everyone's accounts to zero</p>
+                            <p style="font-size: 12px">Tick off the ones you've made and they will be added to the expenses</p>
                             <div class='payments'>
                                 <p class="placeholder">There are no payments to be made</p>
                             </div>
@@ -519,7 +540,7 @@ function getHousehold(hhid){
                 });
 
                 hh.querySelector('#hh-leave-household').addEventListener('click', () => {
-                    hh.popup(`Leave "${household.name}" household`, `
+                    hh.popup(`Leave "${household.name}" household?`, `
                     <p>Are you sure you want to leave this household permanently?<br>
                     Any balance will be lost forever.</p>
                     <div class="spacer"></div>    
@@ -529,7 +550,7 @@ function getHousehold(hhid){
 
                 if(household.isAdmin){
                     hh.querySelector('#hh-delete-household').addEventListener('click', () => {
-                        hh.popup(`Delete "${household.name}" household`, `
+                        hh.popup(`Delete "${household.name}" household?`, `
                         <p>Are you sure you want to delete this household permanently?<br>
                         Any data and user balances will be lost forever!</p>
                         <div class="spacer"></div>    
@@ -557,16 +578,37 @@ function getHousehold(hhid){
                     uElement.dataset.id = u.uid;
                     uElement.classList.add('user');
                     uElement.innerHTML = `
-                        <div class="row gap-10">
+                        <div class="row gap-10 flex-2">
                             <span class="material-icons face">face</span>
                             <p class="full-name">${u.name} ${u.surname}</p>
                         </div>
                         <p class="expense-count justify-end">${u.expenses} Expenses</p>
                         <div class="row gap-10 justify-end">
                             <p class="balance">${u.balance.toFixed(2)} ${household.currency}</p>
-                            <span class="material-icons icn dots">more_vert</span>
+                            <span class="material-icons icn dots">person_remove</span>
                         </div>
                     `;
+
+                    if(household.adminId === u.uid){
+                        uElement.querySelector('.full-name').classList.add('admin-tag');
+                    }
+
+                    if(household.isAdmin){
+                        uElement.querySelector('.dots').addEventListener('click', () => {
+                            hh.popup(`Remove ${u.name} ${u.surname} from "${household.name}"?`, `
+                            <p>Are you sure you want to remove this person from household?<br>
+                            Any data will be lost forever!</p>
+                            <div class="spacer"></div>    
+                            <button class="primary at-the-end" onclick="leaveHousehold('${household.hhid}', '${u.uid}')">
+                                <span class="material-icons icn">remove_circle</span>
+                                Remove
+                            </button>
+                            `);
+                        });
+                    } else {
+                        uElement.querySelector('.dots').classList.add('hidden');
+                    }
+
                     userBox.appendChild(uElement);
                 });
                 
@@ -598,16 +640,18 @@ function getHousehold(hhid){
                                     <p class="payer"><strong style="font-size: 12px">FROM</strong> ${e.paidBy}</p>
                                     <p class="payers"><strong style="font-size: 12px">TO</strong> ${e.payers}</p>
                                 </div>
-                                <div>
-                                    <p class="start-date">${(new Date(e.startDate)).toISOString().split('T')[0]}</p>
-                                    <p class="end-date">${(new Date(e.endDate)).toISOString().split('T')[0]}</p>
-                                </div>
+                                
+                                <p class="frequency">${e.frequency}</p>
                                 <div class="row gap-10">
                                     <p class="amount">${e.amount.toFixed(2)} ${household.currency}</p>
                                     <span class="material-icons icn dots">delete</span>
                                 </div>
                             </div>
                         `;
+                        // <div>
+                        //     <p class="start-date">${(new Date(e.startDate)).toISOString().split('T')[0]}</p>
+                        //     <p class="end-date">${(new Date(e.endDate)).toISOString().split('T')[0]}</p>
+                        // </div>
                         recurringBox.appendChild(eElement);
                     });
                 }
@@ -1005,6 +1049,11 @@ function initExpense(categories) {
     frequencies.forEach(f => {
         frequencyBox.addPick(f.id, `<p class="dye-active caps-title">${f.value}</p>`);
     });
+}
+
+function resetNav(){
+    const menuBtns = document.querySelectorAll("#navigation > p");
+    menuBtns.forEach(g => g.classList.remove('active'));
 }
 
 // Returns how long ago specified date and time occured
